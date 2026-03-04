@@ -936,7 +936,7 @@
 <nav class="nav" id="mainNav">
   <div class="wrap">
     <div class="nav-row">
-      <a href="#" class="logo">
+      <a href="#hero" class="logo">
         <div class="logo-ico">⚙</div>
         <div>
           <span class="logo-name">HydroBot</span>
@@ -1728,7 +1728,7 @@
     <div class="footer-grid">
 
       <div class="footer-brand">
-        <a href="#" class="logo">
+        <a href="#hero" class="logo">
           <div class="logo-ico">⚙</div>
           <div>
             <span class="logo-name">HydroBot</span>
@@ -1763,9 +1763,7 @@
         <ul class="flinks">
           <li><a href="about.html">О нас</a></li>
           <li><a href="cases.html">Кейсы</a></li>
-          <li><a href="#">Блог</a></li>
-          <li><a href="#">Партнёрам</a></li>
-          <li><a href="#">Контакты</a></li>
+          <li><a href="index.html#contact">Контакты</a></li>
         </ul>
       </div>
 
@@ -1773,9 +1771,7 @@
         <div class="fcol-title">Поддержка</div>
         <ul class="flinks">
           <li><a href="#faq">FAQ</a></li>
-          <li><a href="#">Help Center</a></li>
-          <li><a href="#">API</a></li>
-          <li><a href="#">Статус системы</a></li>
+          <li><a href="docs.html">Help Center</a></li>
         </ul>
       </div>
     </div>
@@ -1785,7 +1781,7 @@
       <div class="footer-legal">
         <a href="privacy.html">Политика конфиденциальности</a>
         <a href="offer.html">Договор оферты</a>
-        <a href="#">152-ФЗ</a>
+        <a href="privacy.html#data">152-ФЗ</a>
       </div>
     </div>
   </div>
@@ -1901,6 +1897,7 @@ const heroBot = {
   time: '14:22 · ответ за 7 сек'
 };
 function addTyping() {
+  if (!heroChat) return;
   const el = document.createElement('div');
   el.className = 'typing'; el.id = 'heroTyping';
   el.innerHTML = '<div class="dots"><span></span><span></span><span></span></div><span>HydroBot отвечает...</span>';
@@ -1908,6 +1905,7 @@ function addTyping() {
   heroChat.scrollTop = 9999;
 }
 function addBotMsg() {
+  if (!heroChat) return;
   document.getElementById('heroTyping')?.remove();
   const el = document.createElement('div');
   el.className = 'msg msg-out';
@@ -1952,7 +1950,7 @@ function typewrite(el, text, speed, onDone) {
 }
 let demoRan = false;
 function runDemo() {
-  if (demoRan) return; demoRan = true;
+  if (demoRan || !demoMsgs) return; demoRan = true;
   demoSeq.forEach(m => {
     setTimeout(() => {
       const wrap = document.createElement('div'); wrap.className = `dm ${m.cls}`;
@@ -2020,6 +2018,9 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   fName.addEventListener('input',  () => { if (fName.value)  mark(fName,  eName,  !checkName(fName.value)); });
   fEmail.addEventListener('input', () => { if (fEmail.value) mark(fEmail, eEmail, !checkEmail(fEmail.value)); });
   fMsg.addEventListener('input',   () => { if (fMsg.value)   mark(fMsg,   eMsg,   !checkMsg(fMsg.value)); });
+  fName.addEventListener('blur',  () => { mark(fName,  eName,  !checkName(fName.value)); });
+  fEmail.addEventListener('blur', () => { mark(fEmail, eEmail, !checkEmail(fEmail.value)); });
+  fMsg.addEventListener('blur',   () => { mark(fMsg,   eMsg,   !checkMsg(fMsg.value)); });
 
   function resetForm() {
     formOk.classList.remove('show');
@@ -2055,8 +2056,8 @@ document.querySelectorAll('.faq-q').forEach(btn => {
   // TG_CHATID — chat_id чата/канала для получения уведомлений
   //   Как узнать chat_id: напишите боту, затем откройте
   //   https://api.telegram.org/bot<TG_TOKEN>/getUpdates
-  const TG_TOKEN  = 'YOUR_BOT_TOKEN';
-  const TG_CHATID = 'YOUR_CHAT_ID';
+  const TG_TOKEN  = '8132230517:AAGA8qWyUDEl_FxduK0hTXf19hUPcqSPPF4';
+  const TG_CHATID = '499622919';
 
   form.addEventListener('submit', e => {
     e.preventDefault();
