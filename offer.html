@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Договор публичной оферты — HydroBot | ПромГидравлика-С</title>
+  <meta name="description" content="Договор публичной оферты на использование сервиса HydroBot. Тарифы, гарантии, условия отмены, SLA 99.9%.">
+  <meta property="og:title" content="Договор публичной оферты — HydroBot">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og-image.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0D1B2A; --bg-2: #152234; --bg-3: #1C2D42;
+      --border: rgba(255,255,255,0.07);
+      --accent: #2563EB; --accent-h: #1D4ED8; --accent-glow: rgba(37,99,235,0.28);
+      --green: #10B981;
+      --t1: #F0F6FC; --t2: #94A3B8; --t3: #546678;
+      --r: 10px; --r-lg: 18px; --tr: 0.22s ease; --sh: 0 6px 28px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; overflow-x: hidden; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--t1); line-height: 1.6; overflow-x: hidden; }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+    h1 { font-size: clamp(1.9rem, 4.5vw + .4rem, 3.6rem); line-height: 1.12; font-weight: 800; }
+    h2 { font-size: clamp(1.55rem, 2.8vw + .4rem, 2.6rem); line-height: 1.18; font-weight: 700; }
+    h3 { font-size: clamp(1.05rem, 1.5vw + .3rem, 1.4rem); line-height: 1.3; font-weight: 700; }
+    .accent { color: var(--accent); }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+    .tag { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; background: rgba(37,99,235,.1); border: 1px solid rgba(37,99,235,.3); border-radius: 30px; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 26px; border-radius: var(--r); font-size: .95rem; font-weight: 700; white-space: nowrap; min-height: 48px; border: 2px solid transparent; transition: all var(--tr); }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-primary:hover { background: var(--accent-h); border-color: var(--accent-h); box-shadow: 0 4px 20px var(--accent-glow); transform: translateY(-2px); }
+    .btn-ghost { background: transparent; color: var(--t1); border-color: rgba(255,255,255,.18); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+    .ai { opacity: 0; transform: translateY(28px); transition: opacity .55s ease, transform .55s ease; }
+    .ai.vis { opacity: 1; transform: none; }
+    .ai.d1 { transition-delay: .08s; } .ai.d2 { transition-delay: .16s; }
+
+    /* NAV */
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 16px 0; background: rgba(13,27,42,.96); backdrop-filter: blur(18px); box-shadow: 0 1px 0 var(--border); transition: padding var(--tr); }
+    .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .logo { display: flex; align-items: center; gap: 10px; color: var(--t1); }
+    .logo-ico { width: 38px; height: 38px; border-radius: 9px; flex-shrink: 0; background: linear-gradient(135deg, var(--accent), #3B82F6); display: flex; align-items: center; justify-content: center; font-size: 19px; }
+    .logo-name { font-weight: 800; font-size: 1.1rem; }
+    .logo-sub { font-size: .65rem; color: var(--t2); display: block; }
+    .nav-links { display: flex; align-items: center; gap: 30px; list-style: none; }
+    .nav-links a { font-size: .9rem; color: var(--t2); transition: color var(--tr); }
+    .nav-links a:hover { color: var(--t1); }
+    .burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 4px; min-width: 44px; min-height: 44px; justify-content: center; align-items: center; }
+    .burger span { width: 24px; height: 2px; background: var(--t1); border-radius: 2px; display: block; transition: all .3s; }
+    .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger.open span:nth-child(2) { opacity: 0; }
+    .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mob-nav { display: flex; position: fixed; inset: 0; z-index: 999; background: rgba(10,19,30,.98); backdrop-filter: blur(12px); flex-direction: column; align-items: center; justify-content: center; gap: 0; transform: translateY(-100%); opacity: 0; pointer-events: none; transition: transform .32s cubic-bezier(.4,0,.2,1), opacity .28s ease; }
+    .mob-nav.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .mob-nav a { font-size: 1.6rem; font-weight: 700; color: var(--t1); transition: color var(--tr); min-height: 56px; display: flex; align-items: center; padding: 0 28px; }
+    .mob-nav a:hover { color: var(--accent); }
+    .mob-nav > * { opacity: 0; transform: translateY(-14px); }
+    @keyframes menuItemIn { to { opacity: 1; transform: none; } }
+    .mob-nav.open > *:nth-child(1) { animation: menuItemIn .25s .10s ease both; }
+    .mob-nav.open > *:nth-child(2) { animation: menuItemIn .25s .18s ease both; }
+    .mob-nav.open > *:nth-child(3) { animation: menuItemIn .25s .26s ease both; }
+    .mob-nav.open > *:nth-child(4) { animation: menuItemIn .25s .34s ease both; }
+    .mob-nav.open > *:nth-child(5) { animation: menuItemIn .25s .42s ease both; }
+    .mob-nav.open > *:nth-child(6) { animation: menuItemIn .25s .50s ease both; }
+
+    /* PAGE HERO */
+    .page-hero { padding: 130px 0 72px; background: linear-gradient(180deg, var(--bg-2), var(--bg)); border-bottom: 1px solid var(--border); }
+    .page-hero .tag { margin-bottom: 18px; }
+    .page-hero h1 { margin-bottom: 14px; }
+    .page-hero .sub { font-size: clamp(.95rem, 1.3vw, 1.1rem); color: var(--t2); max-width: 580px; line-height: 1.7; }
+    .page-hero .upd { margin-top: 18px; font-size: .8rem; color: var(--t3); }
+
+    /* CONTENT */
+    .doc-wrap { max-width: 820px; margin: 0 auto; padding: 0 20px; }
+    .doc-section { padding: 52px 0; border-bottom: 1px solid var(--border); }
+    .doc-section:last-child { border-bottom: none; }
+    .doc-section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; color: var(--t1); }
+    .doc-section p { font-size: .93rem; color: var(--t2); line-height: 1.75; margin-bottom: 14px; }
+    .doc-section p:last-child { margin-bottom: 0; }
+    .doc-section ul, .doc-section ol { padding-left: 22px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+    .doc-section li { font-size: .93rem; color: var(--t2); line-height: 1.65; }
+    .doc-section strong { color: var(--t1); font-weight: 600; }
+    .doc-section a { color: var(--accent); transition: color var(--tr); }
+    .doc-section a:hover { color: var(--accent-h); }
+    .doc-box { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r); padding: 22px 26px; margin: 20px 0; }
+    .doc-box.green { background: rgba(16,185,129,.06); border-color: rgba(16,185,129,.2); }
+    .doc-box.blue  { background: rgba(37,99,235,.06);  border-color: rgba(37,99,235,.2); }
+    .doc-box p { margin-bottom: 0; }
+    .doc-table-wrap { overflow-x: auto; margin: 20px 0; }
+    .doc-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    .doc-table th { background: var(--bg-3); color: var(--t1); font-weight: 700; padding: 11px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    .doc-table td { padding: 10px 16px; color: var(--t2); border-bottom: 1px solid var(--border); vertical-align: top; }
+    .doc-table tr:last-child td { border-bottom: none; }
+    .doc-table tr:hover td { background: rgba(255,255,255,.02); }
+    .sec-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(37,99,235,.15); color: var(--accent); font-size: .78rem; font-weight: 800; margin-right: 10px; flex-shrink: 0; }
+    .sec-title { display: flex; align-items: center; margin-bottom: 20px; }
+    .sec-title h2 { margin-bottom: 0; }
+
+    /* Pricing cards */
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0; }
+    .plan-card { background: var(--bg-3); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 26px 22px; position: relative; }
+    .plan-card.featured { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 16px 40px var(--accent-glow); }
+    .plan-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 3px 12px; border-radius: 20px; white-space: nowrap; }
+    .plan-name { font-size: .73rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--t3); margin-bottom: 10px; }
+    .plan-price { font-size: 1.9rem; font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 6px; }
+    .plan-price small { font-size: .85rem; font-weight: 400; color: var(--t2); }
+    .plan-desc { font-size: .82rem; color: var(--t2); margin-bottom: 16px; line-height: 1.5; }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 7px; padding: 0; }
+    .plan-features li { font-size: .82rem; color: var(--t2); display: flex; align-items: flex-start; gap: 7px; line-height: 1.4; }
+    .plan-features li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+    .plan-features li.no::before { content: '—'; color: var(--t3); font-weight: 400; }
+    .plan-features li.no { color: var(--t3); }
+
+    /* FOOTER */
+    .footer { background: var(--bg-3); border-top: 1px solid var(--border); padding: 58px 0 28px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 36px; margin-bottom: 44px; }
+    .footer-brand { display: flex; flex-direction: column; gap: 14px; }
+    .footer-desc { font-size: .84rem; color: var(--t2); line-height: 1.65; }
+    .footer-contacts { display: flex; flex-direction: column; gap: 7px; }
+    .footer-contacts a { display: flex; align-items: center; gap: 7px; font-size: .84rem; color: var(--t2); transition: color var(--tr); }
+    .footer-contacts a:hover { color: var(--accent); }
+    .fcol-title { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--t3); margin-bottom: 14px; }
+    .flinks { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .flinks a { font-size: .84rem; color: var(--t2); transition: color var(--tr); }
+    .flinks a:hover { color: var(--accent); }
+    .footer-bot { border-top: 1px solid var(--border); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .footer-copy { font-size: .78rem; color: var(--t3); }
+    .footer-legal { display: flex; gap: 18px; }
+    .footer-legal a { font-size: .78rem; color: var(--t3); transition: color var(--tr); }
+    .footer-legal a:hover { color: var(--t2); }
+
+    /* FLOAT */
+    .float-btn { position: fixed; bottom: 26px; right: 26px; z-index: 900; display: flex; align-items: center; gap: 9px; background: var(--accent); color: #fff; padding: 13px 20px; border-radius: 30px; border: none; font-size: .88rem; font-weight: 700; box-shadow: 0 4px 20px rgba(37,99,235,.48); transition: all var(--tr); cursor: pointer; animation: fpulse 2.6s ease-in-out infinite; min-width: 44px; min-height: 44px; }
+    .float-btn:hover { background: var(--accent-h); transform: translateY(-3px); animation: none; }
+    @keyframes fpulse { 0%,100% { box-shadow: 0 4px 20px rgba(37,99,235,.48); } 50% { box-shadow: 0 4px 28px rgba(37,99,235,.7), 0 0 0 7px rgba(37,99,235,.1); } }
+    #backTop { position: fixed; bottom: 90px; right: 24px; z-index: 900; width: 48px; height: 48px; border-radius: 50%; border: none; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 18px rgba(37,99,235,.45); cursor: pointer; opacity: 0; transform: translateY(14px); pointer-events: none; transition: opacity .3s ease, transform .3s ease; }
+    #backTop.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    #backTop:hover { transform: translateY(-2px) scale(1.1); }
+    .mob-sticky { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 850; padding: 12px 16px 16px; background: rgba(13,27,42,.97); backdrop-filter: blur(14px); border-top: 1px solid var(--border); transform: translateY(100%); transition: transform .3s cubic-bezier(.4,0,.2,1); }
+    .mob-sticky.show { transform: translateY(0); }
+    .btn-full { width: 100%; }
+    .cta-strip { background: var(--bg-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 52px 0; text-align: center; }
+    .cta-strip h2 { margin-bottom: 12px; font-size: 1.55rem; }
+    .cta-strip p { color: var(--t2); font-size: .93rem; margin-bottom: 28px; }
+    .cta-btns { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+
+    @media (max-width: 1100px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 768px) {
+      .nav-links, .nav-links + .btn { display: none; }
+      .burger { display: flex; }
+      .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+      .footer-bot { flex-direction: column; text-align: center; }
+      .float-btn .float-lbl { display: none; }
+      .float-btn { width: 54px; height: 54px; border-radius: 50%; padding: 0; justify-content: center; }
+      .mob-sticky { display: block; }
+      body { padding-bottom: 72px; }
+      .doc-section { padding: 38px 0; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 360px; margin-left: auto; margin-right: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ai { opacity: 1 !important; transform: none !important; transition: none !important; }
+      .float-btn { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <div class="wrap">
+    <div class="nav-row">
+      <a href="index.html" class="logo">
+        <div class="logo-ico">⚙</div>
+        <div><span class="logo-name">HydroBot</span><span class="logo-sub">ПромГидравлика-С</span></div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#how">Как работает</a></li>
+        <li><a href="index.html#features">Возможности</a></li>
+        <li><a href="index.html#demo">Демо</a></li>
+        <li><a href="index.html#pricing">Тарифы</a></li>
+        <li><a href="index.html#faq">FAQ</a></li>
+      </ul>
+      <a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-primary" style="font-size:.88rem;padding:10px 20px;min-height:42px;">✈ Написать в Telegram</a>
+      <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="mob-nav" id="mobNav">
+  <a href="index.html#how">Как работает</a>
+  <a href="index.html#features">Возможности</a>
+  <a href="index.html#demo">Демо</a>
+  <a href="index.html#pricing">Тарифы</a>
+  <a href="index.html#faq">FAQ</a>
+  <a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:16px;min-width:220px;justify-content:center;">✈ Написать в Telegram</a>
+</div>
+
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="doc-wrap">
+    <div class="tag">Юридический документ</div>
+    <h1 style="margin-top:18px;">Договор публичной оферты</h1>
+    <p class="sub">Условия использования сервиса HydroBot, тарифы, гарантии и порядок расчётов. Акцепт оферты — начало использования сервиса.</p>
+    <p class="upd">Редакция от 1 марта 2026 г. · Версия 1.0</p>
+  </div>
+</section>
+
+
+<!-- CONTENT -->
+<main>
+  <div class="doc-wrap" style="padding-top:0;">
+
+    <!-- §1 Стороны -->
+    <div class="doc-section ai">
+      <div class="sec-title"><span class="sec-num">1</span><h2>Стороны и предмет договора</h2></div>
+      <p><strong>Исполнитель:</strong> ООО «ПромГидравлика-С», предоставляющее доступ к сервису HydroBot.</p>
+      <p><strong>Заказчик:</strong> любое физическое или юридическое лицо, принявшее условия настоящей оферты путём регистрации в сервисе или начала его использования.</p>
+      <p><strong>Предмет договора:</strong> Исполнитель предоставляет Заказчику доступ к облачной платформе HydroBot — ИИ-ассистенту для автоматической обработки технических запросов в мессенджере Telegram, обучаемому на документах Заказчика.</p>
+      <div class="doc-box blue">
+        <p>Регистрация в сервисе, нажатие кнопки «Начать» или начало использования бесплатного пилота означает полное и безоговорочное принятие условий настоящей оферты.</p>
+      </div>
+    </div>
+
+    <!-- §2 Тарифы -->
+    <div class="doc-section ai">
+      <div class="sec-title"><span class="sec-num">2</span><h2>Тарифные планы</h2></div>
+      <div class="pricing-grid">
+        <div class="plan-card">
+          <div class="plan-name">Старт</div>
+          <div class="plan-price">Бесплатно</div>
+          <p class="plan-desc">Попробуйте на реальных запросах без риска и оплаты.</p>
+          <ul class="plan-features">
+            <li>До 200 диалогов/мес</li>
+            <li>1 PDF-каталог</li>
+            <li>Telegram-канал</li>
+            <li>1 менеджер в дашборде</li>
+            <li>Email-поддержка</li>
+            <li class="no">Интеграция с CRM</li>
+            <li class="no">Автообновление каталога</li>
+          </ul>
+        </div>
+        <div class="plan-card featured">
+          <div class="plan-badge">Популярный</div>
+          <div class="plan-name">Про</div>
+          <div class="plan-price">2 990 ₽ <small>/мес</small></div>
+          <p class="plan-desc">Полная автоматизация входящих. Окупается за первую неделю.</p>
+          <ul class="plan-features">
+            <li>До 3 000 диалогов/мес</li>
+            <li>Любое количество PDF</li>
+            <li>Telegram + виджет на сайте</li>
+            <li>До 10 менеджеров</li>
+            <li>AmoCRM / Bitrix24</li>
+            <li>Telegram-поддержка (4 ч)</li>
+            <li>Автообновление при загрузке</li>
+          </ul>
+        </div>
+        <div class="plan-card">
+          <div class="plan-name">Корпоратив</div>
+          <div class="plan-price">7 990 ₽ <small>/мес</small></div>
+          <p class="plan-desc">Безлимит, интеграция с 1С и личный менеджер проекта.</p>
+          <ul class="plan-features">
+            <li>Безлимит диалогов</li>
+            <li>Любые каналы (TG, сайт, WA)</li>
+            <li>Без ограничений по менеджерам</li>
+            <li>AmoCRM / Bitrix24 + 1С</li>
+            <li>REST API (полный)</li>
+            <li>Личный менеджер проекта</li>
+            <li>Приоритетное обновление</li>
+          </ul>
+        </div>
+      </div>
+      <p>Стоимость тарифов может быть изменена с предварительным уведомлением Заказчика не менее чем за 30 дней. Действующие подписки сохраняют текущую цену на 6 месяцев.</p>
+    </div>
+
+    <!-- §3 Оплата -->
+    <div class="doc-section ai">
+      <div class="sec-title"><span class="sec-num">3</span><h2>Оплата и биллинг</h2></div>
+      <ul>
+        <li><strong>Период:</strong> ежемесячно, списание производится в дату начала подписки</li>
+        <li><strong>Способы оплаты:</strong> банковская карта (Visa, MasterCard, Мир), банковский перевод (для тарифа «Корпоратив»), счёт-фактура (нетто 30 дней по запросу)</li>
+        <li><strong>НДС:</strong> включён в стоимость в соответствии с требованиями законодательства РФ</li>
+        <li><strong>Неуспешный платёж:</strong> аккаунт приостанавливается через 3 дня; автоматические повторные попытки; льготный период — 7 дней до удаления данных</li>
+      </ul>
+      <p>Годовой тариф предоставляется со скидкой 20% от суммы 12 ежемесячных платежей.</p>
+    </div>
+
+    <!-- §4 Бесплатный пилот -->
+    <div class="doc-section ai">
+      <div class="sec-title"><span class="sec-num">4</span><h2>Бесплатный пилот 14 дней</h2></div>
+      <div class="doc-box green">
+        <p>🚀 <strong>Полный доступ к тарифу «Про»</strong> — без кредитной карты, без ограничений функций, без скрытых условий. 14 дней, после которых можно отменить в один клик.</p>
+      </div>
+      <ul>
+        <li>Доступны все функции тарифа «Про»</li>
+        <li>Кредитная карта при регистрации не требуется</li>
+        <li>По окончании пилота — автоматический переход на платный тариф (если не отменён)</li>
+        <li>Отмена — в личном кабинете в любой момент до завершения пилота</li>
+      </ul>
+    </div>
+
+    <!-- §5 Гарантии -->
+    <div class="doc-section ai">
+      <div class="sec-title"><span class="sec-num">5</span><h2>Гарантии результата</h2></div>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Гарантия</th><th>Условие</th><th>Компенсация</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>30-дневная гарантия результата</strong></td>
+              <td>Менеджеры не экономят минимум 5 часов в неделю за первые 30 дней</td>
+              <td>Полный возврат денег без вопросов и штрафов</td>
+            </tr>
+            <tr>
+              <td><strong>48-часовой запуск</strong></td>
+              <td>Запуск HydroBot по вине Исполнителя занял более 48 часов</td>
+              <td>Первый месяц использования бесплатно</td>
+            </tr>
+            <tr>
+              <td><strong>SLA 99.9% доступность</strong></td>
+              <td>Суммарный простой превысил 0.1% в расчётном месяце</td>
+              <td>Кредит 10% от ежемесячного платежа за каждые 0.1% сверх лимита</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Для получения компенсации направьте запрос на <a href="mailto:hydrobot@promgidravlika.ru">hydrobot@promgidravlika.ru</a> с описанием ситуации. Срок рассмотрения — 5 рабочих дней.</p>
+    </div>
+
+    <!-- §6 Отмена и возврат -->
+    <div class="doc-section ai">
+      <div class="sec-title"><span class="sec-num">6</span><h2>Отмена подписки и возврат средств</h2></div>
+      <p><strong>Как отменить:</strong> Личный кабинет → Настройки → Подписка → «Отменить подписку». Никаких звонков менеджеру, никаких штрафов.</p>
+      <ul>
+        <li><strong>Первые 30 дней:</strong> полный возврат средств без объяснения причин</li>
+        <li><strong>После 30 дней:</strong> возврат не предусмотрен (ежемесячные планы не имеют предоплаты)</li>
+        <li><strong>Возврат средств:</strong> в течение 5 рабочих дней на тот же платёжный инструмент</li>
+      </ul>
+      <p><strong>Данные после отмены:</strong> загруженные документы доступны для скачивания 30 дней; журналы переписки хранятся в соответствии с 152-ФЗ (3 года); аккаунт удаляется через 90 дней после отмены (или по запросу немедленно).</p>
+    </div>
+
+    <!-- §7 Запрещённые действия -->
+    <div class="doc-section ai">
+      <div class="sec-title"><span class="sec-num">7</span><h2>Запрещённые действия</h2></div>
+      <p>Заказчик обязуется не использовать сервис для:</p>
+      <ul>
+        <li>Загрузки незаконных материалов, вредоносного программного обеспечения или контента, нарушающего авторские права</li>
+        <li>Выдачи себя за третьих лиц, мошенничества или введения пользователей в заблуждение</li>
+        <li>Обхода ограничений тарифного плана или попыток реверс-инжиниринга сервиса</li>
+        <li>Нарушения требований российского законодательства, в том числе 152-ФЗ, 230-ФЗ</li>
+      </ul>
+      <p>Нарушение данных условий влечёт приостановку аккаунта без возврата средств и, при необходимости, обращение в правоохранительные органы.</p>
+    </div>
+
+    <!-- §8 Ограничение ответственности -->
+    <div class="doc-section ai">
+      <div class="sec-title"><span class="sec-num">8</span><h2>Ограничение ответственности</h2></div>
+      <ul>
+        <li><strong>Максимальная ответственность Исполнителя</strong> ограничена суммой платежей Заказчика за 12 месяцев</li>
+        <li>Исполнитель не несёт ответственности за точность загруженных Заказчиком документов</li>
+        <li>Исполнитель не несёт ответственности за сбои Telegram API и иных сторонних сервисов</li>
+        <li>Сервис предоставляется «как есть», за исключением гарантий, прямо указанных в §5</li>
+      </ul>
+    </div>
+
+    <!-- §9 Право -->
+    <div class="doc-section ai">
+      <div class="sec-title"><span class="sec-num">9</span><h2>Применимое право и разрешение споров</h2></div>
+      <p>Настоящий договор регулируется законодательством Российской Федерации. Споры решаются путём переговоров в течение 30 дней, а при недостижении соглашения — в Арбитражном суде по месту нахождения Исполнителя.</p>
+      <p>Изменения условий договора вступают в силу через 30 дней после публикации уведомления в личном кабинете. Продолжение использования сервиса означает согласие с изменёнными условиями.</p>
+    </div>
+
+    <!-- §10 Контакты -->
+    <div class="doc-section ai">
+      <div class="sec-title"><span class="sec-num">10</span><h2>Реквизиты и контакты</h2></div>
+      <p><strong>ООО «ПромГидравлика-С»</strong><br>
+      Сайт: <a href="https://p-gidravlika.ru" target="_blank" rel="noopener">p-gidravlika.ru</a><br>
+      Телефон: <a href="tel:+78001234567">8-800-123-45-67</a> (бесплатно)<br>
+      Email: <a href="mailto:hydrobot@promgidravlika.ru">hydrobot@promgidravlika.ru</a><br>
+      Telegram: <a href="https://t.me/HydroBotSupport" target="_blank" rel="noopener">@HydroBotSupport</a></p>
+    </div>
+
+  </div>
+</main>
+
+
+<!-- CTA -->
+<section class="cta-strip">
+  <div class="wrap">
+    <h2>Начните бесплатный пилот прямо сейчас</h2>
+    <p>14 дней полного доступа. Без карты. Отмена в один клик.</p>
+    <div class="cta-btns">
+      <a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-primary">✈ Начать в Telegram →</a>
+      <a href="index.html#contact" class="btn btn-ghost">Задать вопрос</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="logo">
+          <div class="logo-ico">⚙</div>
+          <div><span class="logo-name">HydroBot</span><span class="logo-sub">ПромГидравлика-С</span></div>
+        </a>
+        <p class="footer-desc">ИИ-ассистент для производителей гидравлического оборудования. Отвечает на технические вопросы по вашим PDF-каталогам через Telegram 24/7.</p>
+        <div class="footer-contacts">
+          <a href="tel:+78001234567">📞 8-800-123-45-67 (бесплатно)</a>
+          <a href="mailto:hydrobot@promgidravlika.ru">✉️ hydrobot@promgidravlika.ru</a>
+          <a href="https://t.me/HydroBotSupport">✈️ @HydroBotSupport</a>
+        </div>
+      </div>
+      <div>
+        <div class="fcol-title">Продукт</div>
+        <ul class="flinks">
+          <li><a href="index.html#how">Как работает</a></li>
+          <li><a href="index.html#features">Возможности</a></li>
+          <li><a href="index.html#demo">Демо</a></li>
+          <li><a href="index.html#pricing">Тарифы</a></li>
+          <li><a href="docs.html">Документация</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fcol-title">Компания</div>
+        <ul class="flinks">
+          <li><a href="about.html">О нас</a></li>
+          <li><a href="cases.html">Кейсы</a></li>
+          <li><a href="index.html#faq">FAQ</a></li>
+          <li><a href="https://t.me/HydroBotSupport">Поддержка</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fcol-title">Правовые</div>
+        <ul class="flinks">
+          <li><a href="privacy.html">Политика конфиденциальности</a></li>
+          <li><a href="offer.html">Договор оферты</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div class="footer-copy">© 2026 ПромГидравлика-С. Все права защищены.</div>
+      <div class="footer-legal">
+        <a href="privacy.html">Политика конфиденциальности</a>
+        <a href="offer.html">Договор оферты</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<button class="float-btn" id="floatBtn"><span>💬</span><span class="float-lbl">Задать вопрос HydroBot</span></button>
+<div class="mob-sticky" id="mobSticky"><a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-primary btn-full">✈ Написать HydroBot в Telegram →</a></div>
+<button id="backTop" aria-label="Наверх"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 13V5M5 9l4-4 4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+
+<script>
+const burger = document.getElementById('burger');
+const mobNav = document.getElementById('mobNav');
+function closeMobNav() { burger.classList.remove('open'); mobNav.classList.remove('open'); document.body.style.overflow = ''; }
+burger.addEventListener('click', () => { burger.classList.toggle('open'); mobNav.classList.toggle('open'); document.body.style.overflow = mobNav.classList.contains('open') ? 'hidden' : ''; });
+mobNav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobNav));
+document.addEventListener('click', e => { if (mobNav.classList.contains('open') && !mobNav.contains(e.target) && !burger.contains(e.target)) closeMobNav(); });
+document.getElementById('floatBtn').addEventListener('click', () => window.open('https://t.me/HydroBot', '_blank', 'noopener'));
+const obs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } }); }, { threshold: 0.1 });
+document.querySelectorAll('.ai').forEach(el => obs.observe(el));
+(function() { const btn = document.getElementById('backTop'); window.addEventListener('scroll', () => btn.classList.toggle('show', window.scrollY > 300), { passive: true }); btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' })); })();
+(function() { const bar = document.getElementById('mobSticky'); window.addEventListener('scroll', () => { const max = document.documentElement.scrollHeight - window.innerHeight; bar.classList.toggle('show', max > 0 ? window.scrollY / max > 0.30 : false); }, { passive: true }); })();
+</script>
+</body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>О нас — HydroBot | ПромГидравлика-С</title>
+  <meta name="description" content="ПромГидравлика-С — разработчик HydroBot, ИИ-ассистента для производителей гидравлического оборудования. Наша миссия, ценности и контакты.">
+  <meta property="og:title" content="О нас — HydroBot | ПромГидравлика-С">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og-image.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0D1B2A; --bg-2: #152234; --bg-3: #1C2D42;
+      --border: rgba(255,255,255,0.07);
+      --accent: #2563EB; --accent-h: #1D4ED8; --accent-glow: rgba(37,99,235,0.28);
+      --green: #10B981;
+      --t1: #F0F6FC; --t2: #94A3B8; --t3: #546678;
+      --r: 10px; --r-lg: 18px; --tr: 0.22s ease; --sh: 0 6px 28px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; overflow-x: hidden; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--t1); line-height: 1.6; overflow-x: hidden; }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+    h1 { font-size: clamp(1.9rem, 4.5vw + .4rem, 3.6rem); line-height: 1.12; font-weight: 800; }
+    h2 { font-size: clamp(1.55rem, 2.8vw + .4rem, 2.6rem); line-height: 1.18; font-weight: 700; }
+    h3 { font-size: clamp(1.05rem, 1.5vw + .3rem, 1.4rem); line-height: 1.3; font-weight: 700; }
+    .accent { color: var(--accent); }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+    .tag { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; background: rgba(37,99,235,.1); border: 1px solid rgba(37,99,235,.3); border-radius: 30px; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 26px; border-radius: var(--r); font-size: .95rem; font-weight: 700; white-space: nowrap; min-height: 48px; border: 2px solid transparent; transition: all var(--tr); }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-primary:hover { background: var(--accent-h); border-color: var(--accent-h); box-shadow: 0 4px 20px var(--accent-glow); transform: translateY(-2px); }
+    .btn-ghost { background: transparent; color: var(--t1); border-color: rgba(255,255,255,.18); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+    .section { padding: 86px 0; }
+    .sec-head { margin-bottom: 56px; }
+    .sec-head.center { text-align: center; }
+    .sec-head .tag { margin-bottom: 18px; }
+    .sec-head h2 { margin-bottom: 14px; }
+    .sec-head p { font-size: clamp(.95rem, 1.3vw, 1.1rem); color: var(--t2); line-height: 1.7; max-width: 620px; }
+    .sec-head.center p { margin: 0 auto; }
+    .ai { opacity: 0; transform: translateY(28px); transition: opacity .55s ease, transform .55s ease; }
+    .ai.vis { opacity: 1; transform: none; }
+    .ai.d1 { transition-delay: .08s; } .ai.d2 { transition-delay: .16s; } .ai.d3 { transition-delay: .24s; }
+    .ai.d4 { transition-delay: .32s; } .ai.d5 { transition-delay: .40s; }
+
+    /* NAV */
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 16px 0; background: rgba(13,27,42,.96); backdrop-filter: blur(18px); box-shadow: 0 1px 0 var(--border); }
+    .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .logo { display: flex; align-items: center; gap: 10px; color: var(--t1); }
+    .logo-ico { width: 38px; height: 38px; border-radius: 9px; flex-shrink: 0; background: linear-gradient(135deg, var(--accent), #3B82F6); display: flex; align-items: center; justify-content: center; font-size: 19px; }
+    .logo-name { font-weight: 800; font-size: 1.1rem; }
+    .logo-sub { font-size: .65rem; color: var(--t2); display: block; }
+    .nav-links { display: flex; align-items: center; gap: 30px; list-style: none; }
+    .nav-links a { font-size: .9rem; color: var(--t2); transition: color var(--tr); }
+    .nav-links a:hover { color: var(--t1); }
+    .burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 4px; min-width: 44px; min-height: 44px; justify-content: center; align-items: center; }
+    .burger span { width: 24px; height: 2px; background: var(--t1); border-radius: 2px; display: block; transition: all .3s; }
+    .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger.open span:nth-child(2) { opacity: 0; }
+    .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mob-nav { display: flex; position: fixed; inset: 0; z-index: 999; background: rgba(10,19,30,.98); backdrop-filter: blur(12px); flex-direction: column; align-items: center; justify-content: center; gap: 0; transform: translateY(-100%); opacity: 0; pointer-events: none; transition: transform .32s cubic-bezier(.4,0,.2,1), opacity .28s ease; }
+    .mob-nav.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .mob-nav a { font-size: 1.6rem; font-weight: 700; color: var(--t1); transition: color var(--tr); min-height: 56px; display: flex; align-items: center; padding: 0 28px; }
+    .mob-nav a:hover { color: var(--accent); }
+    .mob-nav > * { opacity: 0; transform: translateY(-14px); }
+    @keyframes menuItemIn { to { opacity: 1; transform: none; } }
+    .mob-nav.open > *:nth-child(1) { animation: menuItemIn .25s .10s ease both; }
+    .mob-nav.open > *:nth-child(2) { animation: menuItemIn .25s .18s ease both; }
+    .mob-nav.open > *:nth-child(3) { animation: menuItemIn .25s .26s ease both; }
+    .mob-nav.open > *:nth-child(4) { animation: menuItemIn .25s .34s ease both; }
+    .mob-nav.open > *:nth-child(5) { animation: menuItemIn .25s .42s ease both; }
+    .mob-nav.open > *:nth-child(6) { animation: menuItemIn .25s .50s ease both; }
+
+    /* PAGE HERO */
+    .page-hero { padding: 130px 0 80px; background: linear-gradient(180deg, var(--bg-2), var(--bg)); border-bottom: 1px solid var(--border); overflow: hidden; position: relative; }
+    .page-hero::before { content: ''; position: absolute; top: -120px; right: -120px; width: 480px; height: 480px; background: radial-gradient(ellipse, rgba(37,99,235,.1) 0%, transparent 68%); pointer-events: none; }
+    .page-hero .tag { margin-bottom: 18px; }
+    .page-hero h1 { margin-bottom: 18px; max-width: 680px; }
+    .page-hero .sub { font-size: clamp(.95rem, 1.3vw, 1.12rem); color: var(--t2); max-width: 600px; line-height: 1.75; }
+
+    /* MISSION */
+    .mission-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .mission-text h2 { margin-bottom: 18px; }
+    .mission-text p { font-size: .97rem; color: var(--t2); line-height: 1.8; margin-bottom: 16px; }
+    .mission-text p:last-child { margin-bottom: 0; }
+    .mission-quote { background: var(--bg-2); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--r); padding: 28px; }
+    .mission-quote p { font-size: 1rem; color: var(--t1); font-style: italic; line-height: 1.8; margin-bottom: 14px; }
+    .mission-quote cite { font-size: .82rem; color: var(--t3); font-style: normal; }
+
+    /* VALUES */
+    .values-bg { background: var(--bg-2); }
+    .values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .value-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 32px 26px; transition: border-color var(--tr), transform var(--tr); }
+    .value-card:hover { border-color: rgba(37,99,235,.3); transform: translateY(-4px); }
+    .value-ico { font-size: 2.2rem; margin-bottom: 18px; }
+    .value-card h3 { margin-bottom: 10px; font-size: 1.05rem; }
+    .value-card p { font-size: .88rem; color: var(--t2); line-height: 1.65; }
+
+    /* STATS */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .stat-box { background: var(--bg-2); border: 1px solid var(--border); border-radius: var(--r); padding: 30px 22px; text-align: center; position: relative; overflow: hidden; }
+    .stat-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), #3B82F6); }
+    .stat-big { font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 6px; }
+    .stat-lbl { font-size: .84rem; color: var(--t2); line-height: 1.4; }
+
+    /* STORY */
+    .story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    .story-text h2 { margin-bottom: 18px; }
+    .story-text p { font-size: .97rem; color: var(--t2); line-height: 1.8; margin-bottom: 16px; }
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-item { display: flex; gap: 20px; padding-bottom: 28px; position: relative; }
+    .tl-item:last-child { padding-bottom: 0; }
+    .tl-item:not(:last-child)::before { content: ''; position: absolute; left: 19px; top: 40px; bottom: 0; width: 2px; background: var(--border); }
+    .tl-dot { width: 40px; height: 40px; border-radius: 50%; background: rgba(37,99,235,.15); border: 2px solid rgba(37,99,235,.35); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
+    .tl-body { padding-top: 8px; }
+    .tl-date { font-size: .75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .tl-title { font-size: .95rem; font-weight: 700; margin-bottom: 5px; }
+    .tl-desc { font-size: .85rem; color: var(--t2); line-height: 1.6; }
+
+    /* CONTACTS */
+    .contacts-bg { background: var(--bg-2); }
+    .contacts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .contact-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 28px; display: flex; flex-direction: column; gap: 12px; transition: border-color var(--tr); }
+    .contact-card:hover { border-color: rgba(37,99,235,.25); }
+    .contact-ico { font-size: 1.8rem; }
+    .contact-card h3 { font-size: .93rem; }
+    .contact-card a { font-size: .9rem; color: var(--accent); word-break: break-all; transition: color var(--tr); }
+    .contact-card a:hover { color: var(--accent-h); }
+    .contact-card p { font-size: .83rem; color: var(--t2); }
+
+    /* CTA */
+    .cta-strip { padding: 72px 0; text-align: center; }
+    .cta-strip h2 { margin-bottom: 12px; }
+    .cta-strip p { color: var(--t2); font-size: .97rem; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .cta-btns { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+
+    /* FOOTER */
+    .footer { background: var(--bg-3); border-top: 1px solid var(--border); padding: 58px 0 28px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 36px; margin-bottom: 44px; }
+    .footer-brand { display: flex; flex-direction: column; gap: 14px; }
+    .footer-desc { font-size: .84rem; color: var(--t2); line-height: 1.65; }
+    .footer-contacts { display: flex; flex-direction: column; gap: 7px; }
+    .footer-contacts a { display: flex; align-items: center; gap: 7px; font-size: .84rem; color: var(--t2); transition: color var(--tr); }
+    .footer-contacts a:hover { color: var(--accent); }
+    .fcol-title { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--t3); margin-bottom: 14px; }
+    .flinks { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .flinks a { font-size: .84rem; color: var(--t2); transition: color var(--tr); }
+    .flinks a:hover { color: var(--accent); }
+    .footer-bot { border-top: 1px solid var(--border); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .footer-copy { font-size: .78rem; color: var(--t3); }
+    .footer-legal { display: flex; gap: 18px; }
+    .footer-legal a { font-size: .78rem; color: var(--t3); transition: color var(--tr); }
+    .footer-legal a:hover { color: var(--t2); }
+
+    /* FLOAT */
+    .float-btn { position: fixed; bottom: 26px; right: 26px; z-index: 900; display: flex; align-items: center; gap: 9px; background: var(--accent); color: #fff; padding: 13px 20px; border-radius: 30px; border: none; font-size: .88rem; font-weight: 700; box-shadow: 0 4px 20px rgba(37,99,235,.48); transition: all var(--tr); cursor: pointer; animation: fpulse 2.6s ease-in-out infinite; min-width: 44px; min-height: 44px; }
+    .float-btn:hover { background: var(--accent-h); transform: translateY(-3px); animation: none; }
+    @keyframes fpulse { 0%,100% { box-shadow: 0 4px 20px rgba(37,99,235,.48); } 50% { box-shadow: 0 4px 28px rgba(37,99,235,.7), 0 0 0 7px rgba(37,99,235,.1); } }
+    #backTop { position: fixed; bottom: 90px; right: 24px; z-index: 900; width: 48px; height: 48px; border-radius: 50%; border: none; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 18px rgba(37,99,235,.45); cursor: pointer; opacity: 0; transform: translateY(14px); pointer-events: none; transition: opacity .3s ease, transform .3s ease; }
+    #backTop.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    #backTop:hover { transform: translateY(-2px) scale(1.1); }
+    .mob-sticky { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 850; padding: 12px 16px 16px; background: rgba(13,27,42,.97); backdrop-filter: blur(14px); border-top: 1px solid var(--border); transform: translateY(100%); transition: transform .3s cubic-bezier(.4,0,.2,1); }
+    .mob-sticky.show { transform: translateY(0); }
+    .btn-full { width: 100%; }
+
+    /* RESPONSIVE */
+    @media (max-width: 1100px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 960px) {
+      .mission-grid, .story-grid { grid-template-columns: 1fr; gap: 40px; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .values-grid { grid-template-columns: 1fr 1fr; }
+      .contacts-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .nav-links, .nav-links + .btn { display: none; }
+      .burger { display: flex; }
+      .section { padding: 58px 0; }
+      .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+      .footer-bot { flex-direction: column; text-align: center; }
+      .float-btn .float-lbl { display: none; }
+      .float-btn { width: 54px; height: 54px; border-radius: 50%; padding: 0; justify-content: center; }
+      .mob-sticky { display: block; }
+      body { padding-bottom: 72px; }
+      .values-grid, .contacts-grid, .stats-row { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ai { opacity: 1 !important; transform: none !important; transition: none !important; }
+      .float-btn { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <div class="wrap">
+    <div class="nav-row">
+      <a href="index.html" class="logo">
+        <div class="logo-ico">⚙</div>
+        <div><span class="logo-name">HydroBot</span><span class="logo-sub">ПромГидравлика-С</span></div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#how">Как работает</a></li>
+        <li><a href="index.html#features">Возможности</a></li>
+        <li><a href="index.html#demo">Демо</a></li>
+        <li><a href="index.html#pricing">Тарифы</a></li>
+        <li><a href="index.html#faq">FAQ</a></li>
+      </ul>
+      <a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-primary" style="font-size:.88rem;padding:10px 20px;min-height:42px;">✈ Написать в Telegram</a>
+      <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="mob-nav" id="mobNav">
+  <a href="index.html#how">Как работает</a>
+  <a href="index.html#features">Возможности</a>
+  <a href="index.html#demo">Демо</a>
+  <a href="index.html#pricing">Тарифы</a>
+  <a href="index.html#faq">FAQ</a>
+  <a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:16px;min-width:220px;justify-content:center;">✈ Написать в Telegram</a>
+</div>
+
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="wrap">
+    <div class="tag ai">О компании</div>
+    <h1 class="ai d1">Мы делаем так, чтобы<br>технические менеджеры<br>занимались <span class="accent">сделками,<br>а не поиском в каталоге</span></h1>
+    <p class="sub ai d2">ПромГидравлика-С — команда из инженеров и разработчиков, которые сами работали в гидравлике и знают эту боль изнутри.</p>
+  </div>
+</section>
+
+
+<!-- МИССИЯ -->
+<section class="section" id="mission">
+  <div class="wrap">
+    <div class="mission-grid">
+      <div class="mission-text ai">
+        <div class="tag" style="margin-bottom:18px;">Наша миссия</div>
+        <h2>Вернуть инженерам время на инженерное</h2>
+        <p>Менеджер по продажам гидравлики — это технический эксперт. Он знает устройство гидроцилиндров, разбирается в давлениях и уплотнениях. Но 3–4 часа каждого рабочего дня он тратит не на переговоры, а на поиск в 400-страничном каталоге.</p>
+        <p>HydroBot берёт эту рутину на себя. Бот учится на ваших PDF-каталогах, технических паспортах и регламентах — и отвечает на вопросы клиентов за 9 секунд, пока менеджер закрывает следующую сделку.</p>
+        <p>Наша цель — чтобы ни один клиент не ждал ответа на технический вопрос дольше минуты. И чтобы ни один менеджер не тратил рабочий день на ответы, которые уже написаны в каталоге.</p>
+      </div>
+      <div class="mission-quote ai d1">
+        <p>«Мы запустили первый прототип HydroBot на предприятии по производству гидроцилиндров. Через неделю руководитель написал: "Бот ответил точнее, чем ответил бы наш стажёр". Это стало нашим главным критерием качества.»</p>
+        <cite>— Команда ПромГидравлика-С, 2025</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ЦЕННОСТИ -->
+<section class="section values-bg" id="values">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div class="tag">Ценности</div>
+      <h2 class="ai" style="margin-top:18px;">Три принципа, которые не обсуждаются</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-card ai">
+        <div class="value-ico">🎯</div>
+        <h3>Точность прежде всего</h3>
+        <p>HydroBot отвечает только на основе ваших документов. Никаких выдумок, никаких предположений. Если ответа нет в каталоге — бот честно скажет об этом и передаст диалог менеджеру с полным контекстом.</p>
+      </div>
+      <div class="value-card ai d1">
+        <div class="value-ico">⚡</div>
+        <h3>Скорость — это деньги</h3>
+        <p>Первый, кто ответил, закрывает сделку в 78% случаев. 9 секунд вместо 2 часов — это не комфорт, это конкурентное преимущество. Мы оптимизируем каждый шаг обработки запроса.</p>
+      </div>
+      <div class="value-card ai d2">
+        <div class="value-ico">🔒</div>
+        <h3>Данные — только ваши</h3>
+        <p>Ваши каталоги — ваша интеллектуальная собственность. Мы не передаём их третьим лицам и не используем для обучения общих моделей. Каждый клиент получает изолированный экземпляр базы знаний.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ЦИФРЫ -->
+<section class="section" id="numbers">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div class="tag">В цифрах</div>
+      <h2 class="ai" style="margin-top:18px;">HydroBot сегодня</h2>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box ai">
+        <div class="stat-big">340+</div>
+        <div class="stat-lbl">производственных компаний<br>используют HydroBot</div>
+      </div>
+      <div class="stat-box ai d1">
+        <div class="stat-big">9 сек</div>
+        <div class="stat-lbl">среднее время ответа<br>на технический вопрос</div>
+      </div>
+      <div class="stat-box ai d2">
+        <div class="stat-big">97%</div>
+        <div class="stat-lbl">точность ответов<br>на основе ваших документов</div>
+      </div>
+      <div class="stat-box ai d3">
+        <div class="stat-big">48 ч</div>
+        <div class="stat-lbl">от подписки<br>до полного запуска</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ИСТОРИЯ -->
+<section class="section" style="background:var(--bg-2);" id="story">
+  <div class="wrap">
+    <div class="story-grid">
+      <div class="story-text ai">
+        <div class="tag" style="margin-bottom:18px;">Как это началось</div>
+        <h2>Мы сами работали в гидравлике</h2>
+        <p>Идея HydroBot появилась не в стартап-акселераторе. Она появилась когда технический директор одного из наших партнёров показал нам статистику: его менеджеры тратили 60% рабочего времени на поиск в каталогах и ответы на типовые вопросы о характеристиках продукции.</p>
+        <p>Клиенты задавали одни и те же 40 вопросов. Менеджеры знали ответы наизусть — но каждый раз открывали каталог заново, потому что клиент хотел ссылку на конкретную страницу или артикул.</p>
+        <p>Мы взяли эти 40 вопросов, загрузили в бота каталог и запустили тест. Через три дня менеджеры перестали открывать каталог — они просто смотрели, что ответил бот, и добавляли своё.</p>
+      </div>
+      <div class="ai d1">
+        <div class="tag" style="margin-bottom:28px;">Хронология</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot">💡</div>
+            <div class="tl-body">
+              <div class="tl-date">Лето 2024</div>
+              <div class="tl-title">Первый прототип</div>
+              <div class="tl-desc">Ручная загрузка PDF, базовый поиск по документам, тест на реальном производстве гидроцилиндров.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">🔧</div>
+            <div class="tl-body">
+              <div class="tl-date">Осень 2024</div>
+              <div class="tl-title">Первые 10 клиентов</div>
+              <div class="tl-desc">Открытое бета-тестирование на предприятиях гидравлики и машиностроения. Доработка под реальные каталоги.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">🚀</div>
+            <div class="tl-body">
+              <div class="tl-date">Начало 2025</div>
+              <div class="tl-title">Интеграции с CRM</div>
+              <div class="tl-desc">Поддержка AmoCRM и Bitrix24: заявки из диалогов автоматически создаются как сделки.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">⚙</div>
+            <div class="tl-body">
+              <div class="tl-date">2026</div>
+              <div class="tl-title">HydroBot 2.0</div>
+              <div class="tl-desc">Поддержка нескольких каналов (Telegram + сайт + WhatsApp), REST API, интеграция с 1С. 340+ компаний.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- КОНТАКТЫ -->
+<section class="section contacts-bg" id="contacts">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div class="tag">Свяжитесь с нами</div>
+      <h2 class="ai" style="margin-top:18px;">Есть вопросы? Мы рядом</h2>
+      <p class="ai d1">Ответим в течение 2 часов в рабочее время. Или немедленно — в Telegram.</p>
+    </div>
+    <div class="contacts-grid">
+      <div class="contact-card ai">
+        <div class="contact-ico">📞</div>
+        <h3>Телефон</h3>
+        <a href="tel:+78001234567">8-800-123-45-67</a>
+        <p>Бесплатно по России. Пн–Пт, 9:00–18:00 МСК</p>
+      </div>
+      <div class="contact-card ai d1">
+        <div class="contact-ico">✈️</div>
+        <h3>Telegram</h3>
+        <a href="https://t.me/HydroBotSupport" target="_blank" rel="noopener">@HydroBotSupport</a>
+        <p>Поддержка и быстрые ответы. Реагируем в течение 4 часов.</p>
+      </div>
+      <div class="contact-card ai d2">
+        <div class="contact-ico">✉️</div>
+        <h3>Email</h3>
+        <a href="mailto:hydrobot@promgidravlika.ru">hydrobot@promgidravlika.ru</a>
+        <p>Партнёрство, пресса, юридические вопросы.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- CTA -->
+<section class="cta-strip">
+  <div class="wrap">
+    <h2 class="ai">Проверьте HydroBot на своих данных</h2>
+    <p class="ai d1">14 дней бесплатно. Полный доступ. Без кредитной карты.</p>
+    <div class="cta-btns ai d2">
+      <a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-primary">✈ Начать в Telegram →</a>
+      <a href="cases.html" class="btn btn-ghost">Смотреть кейсы</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="logo">
+          <div class="logo-ico">⚙</div>
+          <div><span class="logo-name">HydroBot</span><span class="logo-sub">ПромГидравлика-С</span></div>
+        </a>
+        <p class="footer-desc">ИИ-ассистент для производителей гидравлического оборудования. Отвечает на технические вопросы по вашим PDF-каталогам через Telegram 24/7.</p>
+        <div class="footer-contacts">
+          <a href="tel:+78001234567">📞 8-800-123-45-67 (бесплатно)</a>
+          <a href="mailto:hydrobot@promgidravlika.ru">✉️ hydrobot@promgidravlika.ru</a>
+          <a href="https://t.me/HydroBotSupport">✈️ @HydroBotSupport</a>
+        </div>
+      </div>
+      <div>
+        <div class="fcol-title">Продукт</div>
+        <ul class="flinks">
+          <li><a href="index.html#how">Как работает</a></li>
+          <li><a href="index.html#features">Возможности</a></li>
+          <li><a href="index.html#demo">Демо</a></li>
+          <li><a href="index.html#pricing">Тарифы</a></li>
+          <li><a href="docs.html">Документация</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fcol-title">Компания</div>
+        <ul class="flinks">
+          <li><a href="about.html">О нас</a></li>
+          <li><a href="cases.html">Кейсы</a></li>
+          <li><a href="index.html#faq">FAQ</a></li>
+          <li><a href="https://t.me/HydroBotSupport">Поддержка</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fcol-title">Правовые</div>
+        <ul class="flinks">
+          <li><a href="privacy.html">Политика конфиденциальности</a></li>
+          <li><a href="offer.html">Договор оферты</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div class="footer-copy">© 2026 ПромГидравлика-С. Все права защищены.</div>
+      <div class="footer-legal">
+        <a href="privacy.html">Политика конфиденциальности</a>
+        <a href="offer.html">Договор оферты</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<button class="float-btn" id="floatBtn"><span>💬</span><span class="float-lbl">Задать вопрос HydroBot</span></button>
+<div class="mob-sticky" id="mobSticky"><a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-primary btn-full">✈ Написать HydroBot в Telegram →</a></div>
+<button id="backTop" aria-label="Наверх"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 13V5M5 9l4-4 4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+
+<script>
+const burger = document.getElementById('burger');
+const mobNav = document.getElementById('mobNav');
+function closeMobNav() { burger.classList.remove('open'); mobNav.classList.remove('open'); document.body.style.overflow = ''; }
+burger.addEventListener('click', () => { burger.classList.toggle('open'); mobNav.classList.toggle('open'); document.body.style.overflow = mobNav.classList.contains('open') ? 'hidden' : ''; });
+mobNav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobNav));
+document.addEventListener('click', e => { if (mobNav.classList.contains('open') && !mobNav.contains(e.target) && !burger.contains(e.target)) closeMobNav(); });
+document.getElementById('floatBtn').addEventListener('click', () => window.open('https://t.me/HydroBot', '_blank', 'noopener'));
+const obs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } }); }, { threshold: 0.1 });
+document.querySelectorAll('.ai').forEach(el => obs.observe(el));
+(function() { const btn = document.getElementById('backTop'); window.addEventListener('scroll', () => btn.classList.toggle('show', window.scrollY > 300), { passive: true }); btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' })); })();
+(function() { const bar = document.getElementById('mobSticky'); window.addEventListener('scroll', () => { const max = document.documentElement.scrollHeight - window.innerHeight; bar.classList.toggle('show', max > 0 ? window.scrollY / max > 0.30 : false); }, { passive: true }); })();
+</script>
+</body>
+</html>

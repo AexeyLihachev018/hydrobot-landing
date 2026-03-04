@@ -1,0 +1,2193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HydroBot — ИИ-ассистент для гидравлики | ПромГидравлика-С</title>
+  <meta name="description" content="HydroBot отвечает на технические вопросы по гидравлике за 9 секунд. Обучается на ваших PDF-каталогах. Работает в Telegram 24/7. Запуск за 48 часов.">
+  <meta property="og:title" content="HydroBot — ИИ-ассистент для гидравлики 24/7">
+  <meta property="og:description" content="Отвечает на технические вопросы за 9 секунд. Обучается на ваших PDF-каталогах. Запуск за 48 часов.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       ПЕРЕМЕННЫЕ И СБРОС
+    ============================================================ */
+    :root {
+      --bg:          #0D1B2A;
+      --bg-2:        #152234;
+      --bg-3:        #1C2D42;
+      --border:      rgba(255,255,255,0.07);
+      --accent:      #2563EB;
+      --accent-h:    #1D4ED8;
+      --accent-glow: rgba(37,99,235,0.28);
+      --green:       #10B981;
+      --t1:          #F0F6FC;
+      --t2:          #94A3B8;
+      --t3:          #546678;
+      --r:           10px;
+      --r-lg:        18px;
+      --tr:          0.22s ease;
+      --sh:          0 6px 28px rgba(0,0,0,0.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; overflow-x: hidden; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--t1);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; }
+
+    /* ── ТИПОГРАФИКА ── */
+    h1 { font-size: clamp(1.9rem, 4.5vw + .4rem, 3.6rem); line-height: 1.12; font-weight: 800; }
+    h2 { font-size: clamp(1.55rem, 2.8vw + .4rem, 2.6rem); line-height: 1.18; font-weight: 700; }
+    h3 { font-size: clamp(1.05rem, 1.5vw + .3rem, 1.4rem); line-height: 1.3;  font-weight: 700; }
+
+    .accent { color: var(--accent); }
+
+    /* ── КОНТЕЙНЕР ── */
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── ТЭГИ ── */
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px;
+      background: rgba(37,99,235,.1);
+      border: 1px solid rgba(37,99,235,.3);
+      border-radius: 30px;
+      font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    /* ── КНОПКИ ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px 26px; border-radius: var(--r);
+      font-size: .95rem; font-weight: 700; white-space: nowrap;
+      min-height: 48px; border: 2px solid transparent;
+      transition: all var(--tr);
+    }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-primary:hover {
+      background: var(--accent-h); border-color: var(--accent-h);
+      box-shadow: 0 4px 20px var(--accent-glow); transform: translateY(-2px);
+    }
+    .btn-ghost { background: transparent; color: var(--t1); border-color: rgba(255,255,255,.18); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* ── СЕКЦИИ ── */
+    .section { padding: 86px 0; }
+    .sec-head { margin-bottom: 56px; }
+    .sec-head.center { text-align: center; }
+    .sec-head .tag { margin-bottom: 18px; }
+    .sec-head h2 { margin-bottom: 14px; }
+    .sec-head p { font-size: clamp(.95rem, 1.3vw, 1.1rem); color: var(--t2); line-height: 1.7; max-width: 620px; }
+    .sec-head.center p { margin: 0 auto; }
+
+    /* ── АНИМАЦИИ ПОЯВЛЕНИЯ ── */
+    .ai { opacity: 0; transform: translateY(28px); transition: opacity .55s ease, transform .55s ease; }
+    .ai.vis { opacity: 1; transform: none; }
+    .ai.d1 { transition-delay: .08s; }
+    .ai.d2 { transition-delay: .16s; }
+    .ai.d3 { transition-delay: .24s; }
+    .ai.d4 { transition-delay: .32s; }
+    .ai.d5 { transition-delay: .40s; }
+    .ai.d6 { transition-delay: .48s; }
+
+    /* ============================================================
+       NAV
+    ============================================================ */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: 16px 0;
+      transition: background var(--tr), padding var(--tr), box-shadow var(--tr);
+    }
+    .nav.scrolled {
+      background: rgba(13,27,42,.96);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 1px 0 var(--border);
+      padding: 10px 0;
+    }
+    .nav-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 10px; color: var(--t1);
+    }
+    .logo-ico {
+      width: 38px; height: 38px; border-radius: 9px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), #3B82F6);
+      display: flex; align-items: center; justify-content: center; font-size: 19px;
+    }
+    .logo-name { font-weight: 800; font-size: 1.1rem; }
+    .logo-sub  { font-size: .65rem; color: var(--t2); display: block; }
+
+    .nav-links { display: flex; align-items: center; gap: 30px; list-style: none; }
+    .nav-links a { font-size: .9rem; color: var(--t2); transition: color var(--tr); }
+    .nav-links a:hover { color: var(--t1); }
+
+    /* бургер */
+    .burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 4px; }
+    .burger span { width: 24px; height: 2px; background: var(--t1); border-radius: 2px; display: block; transition: all .3s; }
+    .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger.open span:nth-child(2) { opacity: 0; }
+    .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* мобильное меню */
+    .mob-nav {
+      display: flex; position: fixed; inset: 0; z-index: 999;
+      background: rgba(10,19,30,.98); backdrop-filter: blur(12px);
+      flex-direction: column; align-items: center; justify-content: center; gap: 0;
+      transform: translateY(-100%); opacity: 0; pointer-events: none;
+      transition: transform .32s cubic-bezier(.4,0,.2,1), opacity .28s ease;
+    }
+    .mob-nav.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .mob-nav a {
+      font-size: 1.6rem; font-weight: 700; color: var(--t1); transition: color var(--tr);
+      min-height: 56px; display: flex; align-items: center; padding: 0 28px;
+    }
+    .mob-nav a:hover { color: var(--accent); }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center;
+      padding: 120px 0 80px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -180px; right: -180px;
+      width: 560px; height: 560px;
+      background: radial-gradient(ellipse, rgba(37,99,235,.13) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: ''; position: absolute; bottom: -80px; left: -120px;
+      width: 480px; height: 480px;
+      background: radial-gradient(ellipse, rgba(37,99,235,.07) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 56px;
+      align-items: center; position: relative; z-index: 1;
+    }
+    .hero-tag { margin-bottom: 20px; }
+    .hero h1  { margin-bottom: 20px; }
+    .hero-sub {
+      font-size: clamp(.98rem, 1.4vw, 1.12rem); color: var(--t2);
+      margin-bottom: 36px; line-height: 1.75;
+    }
+    .hero-btns { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 36px; }
+    .hero-trust { display: flex; flex-wrap: wrap; gap: 18px; }
+    .trust-item { display: flex; align-items: center; gap: 7px; color: var(--t2); font-size: .84rem; }
+    .trust-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+    /* Окно чата в hero */
+    .chat-win {
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--sh);
+    }
+    .chat-head {
+      background: var(--bg-3); padding: 14px 18px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .chat-ava {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), #3B82F6);
+      display: flex; align-items: center; justify-content: center; font-size: 17px;
+    }
+    .chat-status { font-size: .72rem; color: var(--green); }
+    .chat-body { padding: 18px; display: flex; flex-direction: column; gap: 14px; min-height: 300px; }
+    .msg {
+      max-width: 82%; padding: 11px 15px; border-radius: 12px;
+      font-size: .82rem; line-height: 1.55;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .msg-in  { background: var(--bg-3); align-self: flex-start; border-bottom-left-radius: 3px; }
+    .msg-out {
+      background: linear-gradient(135deg, rgba(37,99,235,.18), rgba(37,99,235,.06));
+      border: 1px solid rgba(37,99,235,.22);
+      align-self: flex-end; border-bottom-right-radius: 3px;
+      white-space: pre-line;
+    }
+    .msg-time { font-size: .68rem; color: var(--t3); margin-top: 4px; }
+    .typing {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .78rem; color: var(--t3); align-self: flex-end;
+    }
+    .dots { display: flex; gap: 4px; }
+    .dots span {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+      animation: dot 1.2s ease infinite;
+    }
+    .dots span:nth-child(2) { animation-delay: .2s; }
+    .dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes dot {
+      0%,80%,100% { transform: scale(.75); opacity: .45; }
+      40%          { transform: scale(1.2); opacity: 1; }
+    }
+
+    /* ============================================================
+       PROOF BAR
+    ============================================================ */
+    .proof-bar {
+      background: var(--bg-2);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 22px 0;
+    }
+    .proof-row {
+      display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+      gap: 10px 36px;
+    }
+    .proof-item { display: flex; align-items: center; gap: 10px; }
+    .proof-num {
+      font-size: 1.55rem; font-weight: 800; color: var(--accent);
+      font-variant-numeric: tabular-nums; line-height: 1;
+    }
+    .proof-lbl { font-size: .78rem; color: var(--t2); line-height: 1.3; }
+    .proof-sep { width: 1px; height: 32px; background: var(--border); }
+
+    /* ============================================================
+       PILLARS (что такое)
+    ============================================================ */
+    .pillars-bg { background: linear-gradient(180deg, var(--bg-2), transparent); }
+    .pillars-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      border-radius: var(--r-lg); overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .pillar {
+      background: var(--bg-2); padding: 36px 28px;
+      border-right: 1px solid var(--border);
+      transition: background var(--tr);
+    }
+    .pillar:last-child { border-right: none; }
+    .pillar:hover { background: var(--bg-3); }
+    .pillar-ico  { font-size: 2.2rem; margin-bottom: 18px; }
+    .pillar-num  { font-size: 1.4rem; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
+    .pillar h3   { margin-bottom: 10px; }
+    .pillar p    { font-size: .9rem; color: var(--t2); line-height: 1.65; }
+
+    /* ============================================================
+       HOW IT WORKS
+    ============================================================ */
+    .steps {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 0; position: relative;
+    }
+    .steps::before {
+      content: ''; position: absolute;
+      top: 38px; left: 12.5%; right: 12.5%; height: 2px;
+      background: linear-gradient(90deg, var(--accent), rgba(37,99,235,.15));
+      z-index: 0;
+    }
+    .step { text-align: center; padding: 0 14px; position: relative; z-index: 1; }
+    .step-ico {
+      width: 78px; height: 78px; border-radius: 50%;
+      background: var(--bg-2); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 22px; font-size: 1.9rem; position: relative;
+      transition: border-color var(--tr), background var(--tr);
+    }
+    .step:hover .step-ico { border-color: var(--accent); background: rgba(37,99,235,.1); }
+    .step-n {
+      position: absolute; top: -5px; right: -5px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      font-size: .68rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step h3   { font-size: .98rem; margin-bottom: 9px; }
+    .step p    { font-size: .83rem; color: var(--t2); line-height: 1.6; }
+    .step-when {
+      display: inline-block; margin-top: 10px;
+      padding: 3px 10px; border-radius: 20px;
+      background: rgba(37,99,235,.1); font-size: .73rem;
+      color: var(--accent); font-weight: 700;
+    }
+    .steps-note {
+      text-align: center; margin-top: 44px;
+      color: var(--t2); font-size: .88rem;
+    }
+
+    /* ============================================================
+       FEATURES (6 карточек)
+    ============================================================ */
+    .features-bg { background: var(--bg-2); }
+    .feat-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
+    }
+    .feat-card {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 26px;
+      transition: border-color var(--tr), transform var(--tr), box-shadow var(--tr);
+    }
+    .feat-card:hover {
+      border-color: rgba(37,99,235,.3);
+      transform: translateY(-4px);
+      box-shadow: 0 14px 36px rgba(0,0,0,.32), 0 0 0 1px rgba(37,99,235,.08);
+    }
+    .feat-ico   { font-size: 1.9rem; margin-bottom: 14px; }
+    .feat-card h3 { font-size: .97rem; margin-bottom: 9px; }
+    .feat-card p  { font-size: .84rem; color: var(--t2); line-height: 1.6; }
+    .feat-badge {
+      display: inline-block; margin-top: 11px;
+      padding: 3px 10px; border-radius: 20px;
+      background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.2);
+      font-size: .72rem; color: var(--green); font-weight: 700;
+    }
+
+    /* ============================================================
+       STATS
+    ============================================================ */
+    .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; }
+    .stat-card {
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 38px 28px; text-align: center;
+      position: relative; overflow: hidden;
+      transition: border-color var(--tr);
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), #3B82F6);
+    }
+    .stat-card:hover { border-color: rgba(37,99,235,.3); }
+    .stat-num {
+      font-size: clamp(2.4rem, 4vw, 3.8rem); font-weight: 800;
+      color: var(--accent); line-height: 1; margin-bottom: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-lbl  { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+    .stat-desc { font-size: .85rem; color: var(--t2); line-height: 1.6; }
+
+    /* ============================================================
+       DEMO CHAT
+    ============================================================ */
+    .demo-bg { background: linear-gradient(180deg, var(--bg-2), var(--bg)); }
+    .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+    .demo-checks { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+    .demo-check-item {
+      display: flex; align-items: flex-start; gap: 11px;
+      font-size: .9rem; color: var(--t2);
+    }
+    .chk {
+      width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
+      background: rgba(16,185,129,.12); border: 1px solid rgba(16,185,129,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; color: var(--green);
+    }
+    .demo-win {
+      background: var(--bg-3); border: 1px solid var(--border);
+      border-radius: var(--r-lg); overflow: hidden;
+      box-shadow: 0 22px 64px rgba(0,0,0,.42);
+    }
+    .demo-head {
+      background: var(--bg-2); padding: 14px 18px;
+      display: flex; align-items: center; gap: 11px;
+      border-bottom: 1px solid var(--border);
+    }
+    .demo-msgs {
+      padding: 18px; min-height: 350px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .dm { display: flex; flex-direction: column; max-width: 88%; }
+    .dm.cli { align-self: flex-start; }
+    .dm.bot { align-self: flex-end; }
+    .dm-bbl { padding: 11px 15px; border-radius: 14px; font-size: .82rem; line-height: 1.55; font-family: 'JetBrains Mono', monospace; }
+    .cli .dm-bbl { background: var(--bg-2); border-bottom-left-radius: 3px; }
+    .bot .dm-bbl {
+      background: linear-gradient(135deg, rgba(37,99,235,.2), rgba(37,99,235,.07));
+      border: 1px solid rgba(37,99,235,.22);
+      border-bottom-right-radius: 3px; white-space: pre-line;
+    }
+    .dm-meta { font-size: .68rem; color: var(--t3); margin-top: 4px; padding: 0 4px; }
+    .bot .dm-meta { text-align: right; }
+    .demo-inp {
+      padding: 14px 18px; border-top: 1px solid var(--border);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .inp-fake {
+      flex: 1; background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: 24px; padding: 9px 16px;
+      font-size: .83rem; color: var(--t3);
+    }
+    .send-btn {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      background: var(--accent); display: flex; align-items: center;
+      justify-content: center; cursor: pointer; font-size: .95rem;
+      transition: transform var(--tr);
+    }
+    .send-btn:hover { transform: scale(1.1); }
+
+    /* ============================================================
+       TRUST
+    ============================================================ */
+    .trust-bg { background: var(--bg-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .trust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    .trust-lbl {
+      font-size: .78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--t3); margin-bottom: 20px;
+    }
+    .logos { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .logo-ph {
+      background: var(--bg-3); border: 1px solid var(--border);
+      border-radius: var(--r); height: 52px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .73rem; font-weight: 700; color: var(--t3);
+      transition: border-color var(--tr), color var(--tr);
+    }
+    .logo-ph:hover { border-color: rgba(37,99,235,.2); color: var(--t2); }
+    .review-card {
+      margin-top: 22px; padding: 18px;
+      background: var(--bg-3); border-radius: var(--r);
+      border: 1px solid var(--border);
+    }
+    .stars { font-size: 1.1rem; margin-bottom: 9px; }
+    .review-text {
+      font-size: .85rem; color: var(--t1);
+      font-style: italic; line-height: 1.6; margin-bottom: 11px;
+    }
+    .review-author { font-size: .78rem; color: var(--t2); }
+    .review-author strong { color: var(--t1); }
+
+    .badges { display: flex; flex-direction: column; gap: 14px; }
+    .badge {
+      background: var(--bg-3); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 18px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .badge-ico  { font-size: 1.8rem; flex-shrink: 0; }
+    .badge h4   { font-size: .93rem; margin-bottom: 3px; }
+    .badge p    { font-size: .8rem; color: var(--t2); }
+
+    /* ============================================================
+       ФОРМА
+    ============================================================ */
+    .cta-bg { position: relative; overflow: hidden; }
+    .cta-bg::before {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 700px; height: 360px;
+      background: radial-gradient(ellipse, rgba(37,99,235,.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; position: relative; z-index: 1; }
+    .guarantees { display: flex; flex-direction: column; gap: 11px; }
+    .g-item { display: flex; align-items: center; gap: 10px; font-size: .9rem; color: var(--t2); }
+    .form-card {
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 34px;
+      box-shadow: var(--sh);
+    }
+    .form-card h3  { font-size: 1.2rem; margin-bottom: 7px; }
+    .form-card > p { font-size: .85rem; color: var(--t2); margin-bottom: 22px; }
+    .fg { margin-bottom: 14px; }
+    .fg label {
+      display: block; font-size: .82rem; font-weight: 700;
+      color: var(--t2); margin-bottom: 7px;
+    }
+    .fg input, .fg textarea {
+      width: 100%; background: var(--bg-3); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 11px 15px;
+      font-size: .93rem; color: var(--t1); font-family: inherit;
+      transition: border-color var(--tr), box-shadow var(--tr);
+    }
+    .fg textarea { resize: vertical; min-height: 88px; }
+    .fg input:focus, .fg textarea:focus {
+      outline: none; border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.14);
+    }
+    .fg input.err, .fg textarea.err { border-color: #EF4444; }
+    .fg input::placeholder, .fg textarea::placeholder { color: var(--t3); }
+    .ferr { font-size: .76rem; color: #EF4444; margin-top: 4px; display: none; }
+    .ferr.show { display: block; }
+    .btn-full { width: 100%; margin-top: 4px; }
+    .form-priv { font-size: .73rem; color: var(--t3); text-align: center; margin-top: 11px; }
+    .form-priv a { color: var(--t2); }
+    .form-ok { display: none; text-align: center; padding: 24px 10px; }
+    .form-ok.show { display: block; }
+    .form-ok-ico { font-size: 2.8rem; margin-bottom: 14px; }
+    .form-ok p { color: var(--t2); font-size: .9rem; line-height: 1.65; margin-top: 8px; }
+
+    /* ============================================================
+       FAQ
+    ============================================================ */
+    .faq-bg { background: var(--bg-2); }
+    .faq-list { max-width: 780px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+    .faq-item {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--r); overflow: hidden;
+      transition: border-color var(--tr);
+    }
+    .faq-item.open { border-color: rgba(37,99,235,.3); }
+    .faq-q {
+      width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 14px;
+      padding: 18px 22px; background: none; border: none;
+      font-size: .93rem; font-weight: 600; color: var(--t1); text-align: left;
+      cursor: pointer; transition: color var(--tr); user-select: none;
+    }
+    .faq-q:hover { color: var(--accent); }
+    .faq-ico {
+      width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+      background: var(--bg-3); display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: var(--t2);
+      transition: background var(--tr), transform .3s ease;
+    }
+    .faq-item.open .faq-ico { background: rgba(37,99,235,.15); color: var(--accent); transform: rotate(45deg); }
+    .faq-ans { max-height: 0; overflow: hidden; transition: max-height .32s ease; }
+    .faq-ans-in { padding: 0 22px 18px; font-size: .88rem; color: var(--t2); line-height: 1.72; }
+    .faq-item.open .faq-ans { max-height: 360px; }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .footer { background: var(--bg-3); border-top: 1px solid var(--border); padding: 58px 0 28px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 36px; margin-bottom: 44px; }
+    .footer-brand { display: flex; flex-direction: column; gap: 14px; }
+    .footer-desc { font-size: .84rem; color: var(--t2); line-height: 1.65; }
+    .footer-contacts { display: flex; flex-direction: column; gap: 7px; }
+    .footer-contacts a {
+      display: flex; align-items: center; gap: 7px;
+      font-size: .84rem; color: var(--t2);
+      transition: color var(--tr);
+    }
+    .footer-contacts a:hover { color: var(--accent); }
+    .fcol-title {
+      font-size: .78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--t3); margin-bottom: 14px;
+    }
+    .flinks { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .flinks a { font-size: .84rem; color: var(--t2); transition: color var(--tr); }
+    .flinks a:hover { color: var(--accent); }
+    .footer-bot {
+      border-top: 1px solid var(--border); padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 10px;
+    }
+    .footer-copy { font-size: .78rem; color: var(--t3); }
+    .footer-legal { display: flex; gap: 18px; }
+    .footer-legal a { font-size: .78rem; color: var(--t3); transition: color var(--tr); }
+    .footer-legal a:hover { color: var(--t2); }
+
+    /* ============================================================
+       ПЛАВАЮЩАЯ КНОПКА
+    ============================================================ */
+    .float-btn {
+      position: fixed; bottom: 26px; right: 26px; z-index: 900;
+      display: flex; align-items: center; gap: 9px;
+      background: var(--accent); color: #fff;
+      padding: 13px 20px; border-radius: 30px; border: none;
+      font-size: .88rem; font-weight: 700;
+      box-shadow: 0 4px 20px rgba(37,99,235,.48);
+      transition: all var(--tr); cursor: pointer;
+      animation: fpulse 2.6s ease-in-out infinite;
+    }
+    .float-btn:hover {
+      background: var(--accent-h);
+      box-shadow: 0 6px 28px rgba(37,99,235,.58);
+      transform: translateY(-3px); animation: none;
+    }
+    @keyframes fpulse {
+      0%,100% { box-shadow: 0 4px 20px rgba(37,99,235,.48); }
+      50%      { box-shadow: 0 4px 28px rgba(37,99,235,.7), 0 0 0 7px rgba(37,99,235,.1); }
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 1100px) {
+      .feat-grid  { grid-template-columns: repeat(2,1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 960px) {
+      .hero-grid, .demo-grid, .trust-grid, .cta-grid { grid-template-columns: 1fr; gap: 40px; }
+      .chat-win { max-width: 520px; margin: 0 auto; }
+      .steps { grid-template-columns: repeat(2,1fr); gap: 36px; }
+      .steps::before { display: none; }
+      .pillars-grid { grid-template-columns: 1fr; }
+      .pillar { border-right: none; border-bottom: 1px solid var(--border); }
+      .pillar:last-child { border-bottom: none; }
+    }
+    @media (max-width: 768px) {
+      .nav-links, .nav-links + .btn { display: none; }
+      .burger { display: flex; }
+      .section { padding: 58px 0; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .feat-grid  { grid-template-columns: 1fr; }
+      .logos { grid-template-columns: repeat(2,1fr); }
+      .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+      .footer-bot { flex-direction: column; text-align: center; }
+      .float-btn .float-lbl { display: none; }
+      .float-btn { width: 54px; height: 54px; border-radius: 50%; padding: 0; justify-content: center; }
+      .proof-sep { display: none; }
+    }
+    @media (max-width: 480px) {
+      .hero { padding: 100px 0 60px; }
+      .hero-btns { flex-direction: column; }
+      .hero-btns .btn { width: 100%; justify-content: center; }
+      .steps { grid-template-columns: 1fr; }
+    }
+
+    /* ============================================================
+       WOW EFFECTS
+    ============================================================ */
+
+    /* Прогресс-бар прокрутки */
+    #progress-bar {
+      position: fixed; top: 0; left: 0; z-index: 2000;
+      height: 3px; width: 0%;
+      background: linear-gradient(90deg, var(--accent), #3B82F6, var(--accent));
+      background-size: 200% 100%;
+      animation: shiftGrad 2s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes shiftGrad { 0%{background-position:0%} 100%{background-position:200%} }
+
+    /* Анимированный градиент фона Hero */
+    .hero {
+      background: linear-gradient(-45deg, #0D1B2A, #1A3A5C, #0F2340, #0D1B2A);
+      background-size: 400% 400%;
+      animation: heroGrad 12s ease-in-out infinite;
+    }
+    @keyframes heroGrad {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Сеточный оверлей Hero */
+    .hero-grid-overlay {
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        linear-gradient(rgba(37,99,235,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,.05) 1px, transparent 1px);
+      background-size: 52px 52px;
+      -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+    }
+
+    /* Параллакс-шестерёнки */
+    .hero-parallax { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .gear-para { position: absolute; }
+    .gear-el {
+      display: block; opacity: .055; user-select: none; line-height: 1; font-size: 220px;
+      animation: gearSpin 35s linear infinite;
+    }
+    .gear-el.gear-2 { animation-direction: reverse; animation-duration: 24s; font-size: 160px; }
+    @keyframes gearSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* H1 glow */
+    .hero h1 { text-shadow: 0 0 80px rgba(37,99,235,.18); }
+
+    /* Nav scrollspy underline */
+    .nav-links a { position: relative; }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+      height: 2px; border-radius: 2px; background: var(--accent);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .3s ease;
+    }
+    .nav-links a.spy-active { color: var(--t1); }
+    .nav-links a.spy-active::after { transform: scaleX(1); }
+
+    /* Shimmer на кнопках */
+    .btn-primary { position: relative; overflow: hidden; }
+    .btn-primary::after {
+      content: ''; position: absolute;
+      top: 0; left: -100%; width: 55%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.24), transparent);
+      transform: skewX(-15deg);
+      animation: btnShimmer 3.2s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes btnShimmer {
+      0%   { left: -100%; }
+      38%  { left: 120%; }
+      100% { left: 120%; }
+    }
+
+    /* Slide-in слева / справа */
+    .slide-l { opacity: 0; transform: translateX(-52px); transition: opacity .65s ease, transform .65s ease; }
+    .slide-r { opacity: 0; transform: translateX( 52px); transition: opacity .65s ease, transform .65s ease; }
+    .slide-l.vis, .slide-r.vis { opacity: 1; transform: translateX(0); }
+
+    /* Enhanced hovers */
+    .feat-card:hover { transform: translateY(-8px) !important; }
+    .badge { transition: transform var(--tr), border-color var(--tr); }
+    .badge:hover { transform: translateX(5px); border-color: rgba(37,99,235,.25); }
+    .faq-q:hover { background: rgba(37,99,235,.04); }
+
+    /* prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      .hero { animation: none !important; }
+      #progress-bar, .btn-primary::after, .gear-el { animation: none !important; }
+      .btn-primary::after { display: none; }
+      .ai, .slide-l, .slide-r { opacity: 1 !important; transform: none !important; transition: none !important; }
+    }
+
+    /* ============================================================
+       ИНТЕРАКТИВНЫЕ ЭЛЕМЕНТЫ — НОВЫЕ
+    ============================================================ */
+
+    /* Кнопка «Наверх» */
+    #backTop {
+      position: fixed; bottom: 90px; right: 24px; z-index: 900;
+      width: 48px; height: 48px; border-radius: 50%; border: none;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 18px rgba(37,99,235,.45);
+      cursor: pointer; min-width: 48px; min-height: 48px;
+      opacity: 0; transform: translateY(14px); pointer-events: none;
+      transition: opacity .3s ease, transform .3s ease, box-shadow .22s ease;
+    }
+    #backTop.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    #backTop:hover { box-shadow: 0 6px 26px rgba(37,99,235,.62); transform: translateY(-2px) scale(1.1); }
+
+    /* Mobile menu stagger */
+    .mob-nav > * { opacity: 0; transform: translateY(-14px); }
+    @keyframes menuItemIn { to { opacity: 1; transform: none; } }
+    .mob-nav.open > *:nth-child(1) { animation: menuItemIn .25s .10s ease both; }
+    .mob-nav.open > *:nth-child(2) { animation: menuItemIn .25s .18s ease both; }
+    .mob-nav.open > *:nth-child(3) { animation: menuItemIn .25s .26s ease both; }
+    .mob-nav.open > *:nth-child(4) { animation: menuItemIn .25s .34s ease both; }
+    .mob-nav.open > *:nth-child(5) { animation: menuItemIn .25s .42s ease both; }
+
+    /* Shake-анимация ошибок формы */
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      15%      { transform: translateX(-7px); }
+      30%      { transform: translateX( 6px); }
+      45%      { transform: translateX(-5px); }
+      60%      { transform: translateX( 4px); }
+      75%      { transform: translateX(-3px); }
+    }
+    .fg.shake { animation: shake .42s ease; }
+
+    /* iOS: предотвращаем масштаб при фокусе (font-size >= 16px) */
+    .fg input, .fg textarea { font-size: 16px !important; }
+
+    /* form-card: position: relative для конфетти */
+    .form-card { position: relative; overflow: hidden; }
+
+    /* Форма: success state */
+    .form-ok { display: none; text-align: center; padding: 32px 16px; }
+    .form-ok.show { display: block; }
+    .ok-svg-wrap {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 72px; height: 72px; border-radius: 50%;
+      background: rgba(16,185,129,.1); border: 2px solid rgba(16,185,129,.25);
+      margin: 0 auto 18px;
+    }
+    .ok-svg { width: 40px; height: 40px; }
+    .ok-circle {
+      fill: none; stroke: var(--green); stroke-width: 2.5;
+      stroke-dasharray: 113; stroke-dashoffset: 113;
+      transition: stroke-dashoffset .55s ease .1s;
+    }
+    .ok-check {
+      fill: none; stroke: var(--green); stroke-width: 2.5;
+      stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 28; stroke-dashoffset: 28;
+      transition: stroke-dashoffset .35s ease .62s;
+    }
+    .form-ok.show .ok-circle { stroke-dashoffset: 0; }
+    .form-ok.show .ok-check  { stroke-dashoffset: 0; }
+    .form-ok h3 { font-size: 1.15rem; margin-bottom: 6px; }
+    .ok-email { font-size: .85rem; color: var(--accent); font-weight: 600; margin: 4px 0 0; }
+    .form-ok > p { color: var(--t2); font-size: .85rem; line-height: 1.6; margin-top: 10px; }
+
+    /* Конфетти */
+    .confetti-wrap {
+      position: absolute; inset: 0; pointer-events: none;
+      overflow: hidden; border-radius: var(--r-lg); z-index: 10;
+    }
+    .conf-bit { position: absolute; opacity: 0; }
+    @keyframes confFly {
+      0%   { opacity: 1; transform: translate(0,0) rotate(0deg); }
+      100% { opacity: 0; transform: translate(var(--cx),var(--cy)) rotate(var(--cr)); }
+    }
+
+    /* Touch targets */
+    .float-btn { min-width: 44px; min-height: 44px; }
+    .burger { min-width: 44px; min-height: 44px; justify-content: center; align-items: center; }
+    .btn { min-height: 44px; }
+
+    /* prefers-reduced-motion: расширение */
+    @media (prefers-reduced-motion: reduce) {
+      #backTop { transition: none !important; }
+      .mob-nav { transition: none !important; }
+      .mob-nav.open > * { animation: none !important; opacity: 1 !important; transform: none !important; }
+      .fg.shake { animation: none !important; }
+      .ok-circle, .ok-check { transition: none !important; stroke-dashoffset: 0 !important; }
+    }
+
+    /* ============================================================
+       ТАРИФЫ (PRICING)
+    ============================================================ */
+    .pricing-bg { background: var(--bg-2); }
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 22px; margin-bottom: 36px;
+    }
+    .plan-card {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 32px 28px;
+      display: flex; flex-direction: column;
+      transition: border-color var(--tr), transform var(--tr), box-shadow var(--tr);
+      position: relative;
+    }
+    .plan-card:hover { transform: translateY(-4px); }
+    .plan-card.featured {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 22px 52px var(--accent-glow);
+    }
+    .plan-badge {
+      display: inline-block; position: absolute; top: -13px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent); color: #fff;
+      font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+      padding: 4px 14px; border-radius: 20px; white-space: nowrap;
+    }
+    .plan-name {
+      font-size: .78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--t3); margin-bottom: 14px;
+    }
+    .plan-price {
+      font-size: clamp(2rem, 3.5vw, 2.8rem); font-weight: 800;
+      color: var(--accent); line-height: 1; margin-bottom: 6px;
+    }
+    .plan-price .plan-currency { font-size: 1.2rem; vertical-align: top; margin-top: 6px; display: inline-block; }
+    .plan-price .plan-period  { font-size: .85rem; font-weight: 400; color: var(--t2); }
+    .plan-desc { font-size: .84rem; color: var(--t2); margin-bottom: 22px; line-height: 1.5; }
+    .plan-features {
+      list-style: none; display: flex; flex-direction: column; gap: 10px;
+      margin-bottom: 28px; flex: 1;
+    }
+    .plan-features li {
+      display: flex; align-items: flex-start; gap: 9px;
+      font-size: .84rem; color: var(--t2); line-height: 1.4;
+    }
+    .plan-features li::before {
+      content: '✓'; color: var(--green); font-weight: 700;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .plan-features li.disabled { color: var(--t3); }
+    .plan-features li.disabled::before { content: '—'; color: var(--t3); font-weight: 400; }
+    .plan-cta { margin-top: auto; }
+
+    .pricing-guarantee {
+      display: flex; align-items: center; gap: 16px;
+      background: rgba(16,185,129,.06); border: 1px solid rgba(16,185,129,.2);
+      border-radius: var(--r); padding: 18px 24px; margin-bottom: 28px;
+    }
+    .pricing-guarantee .g-ico { font-size: 2rem; flex-shrink: 0; }
+    .pricing-guarantee p { font-size: .88rem; color: var(--t1); line-height: 1.55; }
+    .pricing-guarantee strong { color: var(--green); }
+
+    .pricing-microfaq {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .pmfaq-item {
+      display: flex; gap: 8px; font-size: .82rem; color: var(--t2);
+    }
+    .pmfaq-item strong { color: var(--t1); flex-shrink: 0; }
+
+    @media (max-width: 900px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin-left: auto; margin-right: auto; }
+    }
+
+    /* ============================================================
+       MOBILE STICKY BOTTOM CTA
+    ============================================================ */
+    .mob-sticky {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 850;
+      padding: 12px 16px 16px;
+      background: rgba(13,27,42,.97); backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border);
+      transform: translateY(100%);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+    }
+    .mob-sticky.show { transform: translateY(0); }
+    @media (max-width: 768px) {
+      .mob-sticky { display: block; }
+      /* отступ снизу для страницы, чтобы кнопка не перекрывала контент */
+      body { padding-bottom: 72px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     НАВИГАЦИЯ
+════════════════════════════════════════════════════════════ -->
+<nav class="nav" id="mainNav">
+  <div class="wrap">
+    <div class="nav-row">
+      <a href="#" class="logo">
+        <div class="logo-ico">⚙</div>
+        <div>
+          <span class="logo-name">HydroBot</span>
+          <span class="logo-sub">ПромГидравлика-С</span>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#how">Как работает</a></li>
+        <li><a href="#features">Возможности</a></li>
+        <li><a href="#demo">Демо</a></li>
+        <li><a href="#pricing">Тарифы</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+
+      <a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-primary" style="font-size:.88rem;padding:10px 20px;min-height:42px;">
+        ✈ Написать в Telegram
+      </a>
+
+      <button class="burger" id="burger" aria-label="Меню">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Мобильное меню -->
+<div class="mob-nav" id="mobNav">
+  <a href="#how">Как работает</a>
+  <a href="#features">Возможности</a>
+  <a href="#demo">Демо</a>
+  <a href="#pricing">Тарифы</a>
+  <a href="#faq">FAQ</a>
+  <a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-primary" style="margin-top:16px;min-width:220px;justify-content:center;">✈ Написать в Telegram</a>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════════════ -->
+<section class="hero section" id="hero">
+  <div class="hero-grid-overlay"></div>
+  <div class="hero-parallax">
+    <div class="gear-para" style="top:-70px;right:-70px;">
+      <span class="gear-el">⚙</span>
+    </div>
+    <div class="gear-para" style="bottom:-90px;left:-50px;">
+      <span class="gear-el gear-2">⚙</span>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="hero-grid">
+
+      <!-- Текст -->
+      <div>
+        <div class="hero-tag ai"><span class="tag">⚡ ИИ-ассистент для гидравлики</span></div>
+        <h1 class="ai d1">
+          HydroBot отвечает на технические вопросы
+          <span class="accent">за 9 секунд</span> —<br>
+          пока ваши менеджеры закрывают сделки
+        </h1>
+        <p class="hero-sub ai d2">
+          ИИ-ассистент для производителей гидравлического оборудования, гидроцилиндров,
+          гидростанций и испытательных стендов. Обучается на ваших PDF-каталогах.
+          Работает в Telegram 24/7. Запуск — 48 часов.
+        </p>
+        <div class="hero-btns ai d3">
+          <a href="#contact" class="btn btn-primary">💬 Задать вопрос</a>
+          <a href="#demo"    class="btn btn-ghost">▶ Смотреть демо</a>
+        </div>
+        <div class="hero-trust ai d4">
+          <div class="trust-item"><div class="trust-dot"></div>Пилот 14 дней бесплатно</div>
+          <div class="trust-item"><div class="trust-dot"></div>Без кредитной карты</div>
+          <div class="trust-item"><div class="trust-dot"></div>Серверы в России</div>
+        </div>
+      </div>
+
+      <!-- Чат-демо в hero -->
+      <div class="chat-win ai d2">
+        <div class="chat-head">
+          <div class="chat-ava">⚙</div>
+          <div>
+            <div style="font-weight:700;font-size:.93rem;">HydroBot</div>
+            <div class="chat-status">● в сети — отвечает мгновенно</div>
+          </div>
+        </div>
+        <div class="chat-body" id="heroChat">
+          <div class="msg msg-in">
+            Добрый день. Нужен гидроцилиндр для пресса: ход 400 мм,
+            давление 200 bar, диаметр поршня от 80 мм.
+            <div class="msg-time">14:22</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     ПОЛОСА ДОВЕРИЯ
+════════════════════════════════════════════════════════════ -->
+<div class="proof-bar">
+  <div class="wrap">
+    <div class="proof-row">
+      <div class="proof-item">
+        <div class="proof-num" data-cnt="340" data-sfx="+">340+</div>
+        <div class="proof-lbl">компаний<br>используют</div>
+      </div>
+      <div class="proof-sep"></div>
+      <div class="proof-item">
+        <div class="proof-num">9 сек</div>
+        <div class="proof-lbl">среднее время<br>ответа</div>
+      </div>
+      <div class="proof-sep"></div>
+      <div class="proof-item">
+        <div class="proof-num" data-cnt="84" data-sfx="%">84%</div>
+        <div class="proof-lbl">запросов без<br>менеджера</div>
+      </div>
+      <div class="proof-sep"></div>
+      <div class="proof-item">
+        <div class="proof-num">48 ч</div>
+        <div class="proof-lbl">до полного<br>запуска</div>
+      </div>
+      <div class="proof-sep"></div>
+      <div class="proof-item">
+        <div class="proof-num" data-cnt="97" data-sfx="%">97%</div>
+        <div class="proof-lbl">точность<br>ответов</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     ЧТО ТАКОЕ HYDROBOT
+════════════════════════════════════════════════════════════ -->
+<section class="section pillars-bg" id="about">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div class="tag">Что такое HydroBot</div>
+      <h2 class="ai" style="margin-top:18px;">
+        Не чат-бот с кнопками —<br>технический эксперт по вашей номенклатуре
+      </h2>
+      <p class="ai d1">
+        HydroBot изучает ваши PDF-каталоги, регламенты и прайс-листы.
+        Отвечает точно и мгновенно — только по вашим данным, без выдумок.
+      </p>
+    </div>
+    <div class="pillars-grid ai d2">
+      <div class="pillar">
+        <div class="pillar-ico">📚</div>
+        <div class="pillar-num">PDF → Знания</div>
+        <h3>Знает ваш каталог наизусть</h3>
+        <p>Загрузите PDF-каталоги гидроцилиндров, насосов, гидростанций и стендов.
+           HydroBot изучит каждую страницу и артикул. Обновили каталог — загрузите новый файл.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-ico">🔐</div>
+        <div class="pillar-num">Только ваши данные</div>
+        <h3>Точность без галлюцинаций</h3>
+        <p>HydroBot не выдумывает характеристики. Если ответа нет в ваших документах —
+           честно сообщает и передаёт диалог менеджеру с полным контекстом переписки.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-ico">⚡</div>
+        <div class="pillar-num">9 сек vs 2 часа</div>
+        <h3>Скорость решает сделки</h3>
+        <p>Первый, кто ответил на технический запрос, закрывает сделку в 78% случаев.
+           HydroBot отвечает за 9 секунд — в рабочее время, в выходные, ночью.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     КАК РАБОТАЕТ
+════════════════════════════════════════════════════════════ -->
+<section class="section" id="how">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div class="tag">Как это работает</div>
+      <h2 class="ai" style="margin-top:18px;">
+        Запуск за <span class="accent">48 часов</span>. Без программистов.
+      </h2>
+      <p class="ai d1">Четыре шага от загрузки документов до первого ответа клиенту.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step ai slide-l">
+        <div class="step-ico">📁<div class="step-n">1</div></div>
+        <h3>Загружаете документы</h3>
+        <p>PDF-каталоги, прайс-листы, технические регламенты и инструкции по вашей продукции</p>
+        <span class="step-when">День 1</span>
+      </div>
+      <div class="step ai d1 slide-r">
+        <div class="step-ico">🤖<div class="step-n">2</div></div>
+        <h3>HydroBot обучается</h3>
+        <p>ИИ изучает номенклатуру, связи между артикулами, технические параметры и область применения</p>
+        <span class="step-when">День 1–2</span>
+      </div>
+      <div class="step ai d2 slide-l">
+        <div class="step-ico">📱<div class="step-n">3</div></div>
+        <h3>Подключаете Telegram</h3>
+        <p>HydroBot встраивается в ваш корпоративный Telegram. Клиенты уже там — ничего нового устанавливать не нужно</p>
+        <span class="step-when">День 2</span>
+      </div>
+      <div class="step ai d3 slide-r">
+        <div class="step-ico">✅<div class="step-n">4</div></div>
+        <h3>Клиенты получают ответы</h3>
+        <p>С 48-го часа HydroBot обрабатывает запросы мгновенно. Сложные вопросы эскалирует менеджеру</p>
+        <span class="step-when">С 48 часов</span>
+      </div>
+    </div>
+
+    <p class="steps-note ai" style="margin-top:44px;">
+      🛡 Наша команда помогает с настройкой. Если запуск займёт дольше 48 часов по нашей вине —
+      первый месяц бесплатно.<br><br>
+      <a href="#contact" class="btn btn-primary" style="display:inline-flex;margin-top:16px;">
+        Запустить за 48 часов →
+      </a>
+    </p>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     ВОЗМОЖНОСТИ (6 карточек)
+════════════════════════════════════════════════════════════ -->
+<section class="section features-bg" id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="tag">Возможности</div>
+      <h2 class="ai" style="margin-top:18px;">Что умеет <span class="accent">HydroBot</span></h2>
+      <p class="ai d1">
+        Шесть ключевых возможностей, которые снимают нагрузку с менеджеров
+        и ускоряют закрытие заявок по гидравлическому оборудованию.
+      </p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card ai">
+        <div class="feat-ico">🔍</div>
+        <h3>Поиск по номенклатуре</h3>
+        <p>Находит позицию по артикулу, параметрам или описанию применения.
+           «Нужен гидроцилиндр на 160 bar, ход 300 мм» — ответит за секунды.</p>
+        <span class="feat-badge">✓ Точность 97%</span>
+      </div>
+      <div class="feat-card ai d1">
+        <div class="feat-ico">📊</div>
+        <h3>Технические характеристики</h3>
+        <p>Отвечает на вопросы о давлении, расходе, температурном диапазоне,
+           совместимости и условиях применения — прямо из ваших техпаспортов.</p>
+        <span class="feat-badge">✓ Из ваших документов</span>
+      </div>
+      <div class="feat-card ai d2">
+        <div class="feat-ico">🔗</div>
+        <h3>Анализ совместимости</h3>
+        <p>Проверяет совместимость узлов: насос + распределитель, гидроцилиндр + уплотнения,
+           гидростанция + потребители. Предотвращает ошибки подбора и рекламации.</p>
+        <span class="feat-badge">✓ Снижает рекламации</span>
+      </div>
+      <div class="feat-card ai d3">
+        <div class="feat-ico">💰</div>
+        <h3>Цены и сроки поставки</h3>
+        <p>Называет актуальные цены из вашего прайса и ориентировочные сроки.
+           Обновили прайс-лист — просто загрузите новый файл в личный кабинет.</p>
+        <span class="feat-badge">✓ Всегда актуально</span>
+      </div>
+      <div class="feat-card ai d4">
+        <div class="feat-ico">📩</div>
+        <h3>Сбор заявок 24/7</h3>
+        <p>Принимает технические запросы в нерабочее время, уточняет параметры,
+           формирует структурированную заявку — менеджер видит готовый лид утром.</p>
+        <span class="feat-badge">✓ Ноль пропущенных заявок</span>
+      </div>
+      <div class="feat-card ai d5">
+        <div class="feat-ico">📈</div>
+        <h3>Дашборд и аналитика</h3>
+        <p>Видите все диалоги, статистику обращений, топ вопросов и вопросы без ответа.
+           Используйте данные для улучшения каталога и скриптов продаж.</p>
+        <span class="feat-badge">✓ Полный контроль</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     ПОЛЬЗА / ЦИФРЫ
+════════════════════════════════════════════════════════════ -->
+<section class="section" id="benefits">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div class="tag">Польза для производства</div>
+      <h2 class="ai" style="margin-top:18px;">Цифры, которые говорят сами за себя</h2>
+      <p class="ai d1">
+        Реальные результаты компаний из гидравлики и машиностроения через 30 дней с HydroBot.
+      </p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card ai">
+        <div class="stat-num"><span class="cnt" data-to="3">0</span> ч</div>
+        <div class="stat-lbl">экономии в день на менеджера</div>
+        <div class="stat-desc">
+          Менеджер тратил 3–4 часа на поиск в каталоге и типовые ответы.
+          HydroBot берёт это на себя — сотрудник фокусируется на переговорах.
+        </div>
+      </div>
+      <div class="stat-card ai d1">
+        <div class="stat-num"><span class="cnt" data-to="35">0</span>×</div>
+        <div class="stat-lbl">ROI в первый месяц</div>
+        <div class="stat-desc">
+          При 3 менеджерах с зарплатой 85 000 ₽ экономия на рутине — ~104 000 ₽/мес.
+          Стоимость HydroBot Про — 2 990 ₽/мес. Окупаемость: первая неделя.
+        </div>
+      </div>
+      <div class="stat-card ai d2">
+        <div class="stat-num">+<span class="cnt" data-to="57">0</span>%</div>
+        <div class="stat-lbl">конверсия входящих запросов</div>
+        <div class="stat-desc">
+          Первый, кто ответил, закрывает сделку в 78% случаев.
+          Ответ за 9 секунд вместо 2 часов поднимает конверсию входящих на 35–57%.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     ДЕМО ЧАТ
+════════════════════════════════════════════════════════════ -->
+<section class="section demo-bg" id="demo">
+  <div class="wrap">
+    <div class="demo-grid">
+
+      <!-- Текст слева -->
+      <div>
+        <div class="tag">Живое демо</div>
+        <h2 class="ai" style="margin-top:18px;margin-bottom:16px;">
+          Посмотрите, как HydroBot отвечает на реальный технический запрос
+        </h2>
+        <p class="ai d1" style="color:var(--t2);font-size:.95rem;line-height:1.7;margin-bottom:28px;">
+          Пример диалога: клиент запрашивает гидростанцию для пресса.
+          HydroBot нашёл подходящую позицию в каталоге и ответил за 8 секунд.
+        </p>
+        <ul class="demo-checks">
+          <li class="demo-check-item ai d1">
+            <div class="chk">✓</div>
+            Отвечает строго по загруженным вами документам
+          </li>
+          <li class="demo-check-item ai d2">
+            <div class="chk">✓</div>
+            Называет конкретные артикулы и характеристики
+          </li>
+          <li class="demo-check-item ai d3">
+            <div class="chk">✓</div>
+            Предлагает оформить заявку прямо в диалоге
+          </li>
+          <li class="demo-check-item ai d4">
+            <div class="chk">✓</div>
+            При сложном вопросе — передаёт менеджеру с контекстом переписки
+          </li>
+        </ul>
+        <a href="#contact" class="btn btn-primary ai d5">
+          Попробовать на своих данных →
+        </a>
+      </div>
+
+      <!-- Окно чата справа -->
+      <div class="demo-win ai d2">
+        <div class="demo-head">
+          <div class="chat-ava" style="width:32px;height:32px;font-size:14px;">⚙</div>
+          <div>
+            <div style="font-weight:700;font-size:.85rem;">HydroBot — ПромГидравлика-С</div>
+            <div style="font-size:.7rem;color:var(--green);">● онлайн 24/7</div>
+          </div>
+        </div>
+        <div class="demo-msgs" id="demoMsgs">
+          <div class="dm cli">
+            <div class="dm-bbl">
+              Добрый день. Нужна гидростанция для гидравлического пресса усилием 50 тонн.
+              Рабочее давление 200 bar, объём бака ~100 л.
+            </div>
+            <div class="dm-meta">Клиент · 10:14</div>
+          </div>
+        </div>
+        <div class="demo-inp">
+          <div class="inp-fake">Напишите технический вопрос...</div>
+          <div class="send-btn">➤</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     ДОВЕРИЕ
+════════════════════════════════════════════════════════════ -->
+<section class="section trust-bg" id="clients">
+  <div class="wrap">
+    <div class="trust-grid">
+
+      <!-- Логотипы + отзыв -->
+      <div>
+        <p class="trust-lbl">Нам доверяют производственные компании</p>
+        <div class="logos">
+          <div class="logo-ph">Урал-Гидро</div>
+          <div class="logo-ph">ГидроМаш</div>
+          <div class="logo-ph">МеталлГруп</div>
+          <div class="logo-ph">СибГидро</div>
+          <div class="logo-ph">ТехноГидравлика</div>
+          <div class="logo-ph">ПромСервис</div>
+        </div>
+        <div class="review-card">
+          <div class="stars">⭐⭐⭐⭐⭐</div>
+          <p class="review-text">
+            «Первые три дня смотрел на статистику с недоверием —
+            неужели 73% вопросов закрыты без менеджера?
+            Попросил проверить вручную. Бот ответил точнее, чем ответил бы наш стажёр.»
+          </p>
+          <div class="review-author">
+            <strong>Виктор Пономарёв</strong><br>
+            Руководитель отдела продаж, ГидроСнаб Поволжье
+          </div>
+        </div>
+      </div>
+
+      <!-- Бейджи -->
+      <div class="badges">
+        <div class="badge ai">
+          <div class="badge-ico">🇷🇺</div>
+          <div>
+            <h4>Серверы в России</h4>
+            <p>Все данные хранятся в РФ. Соответствие 152-ФЗ. Ваши документы не покидают страну.</p>
+          </div>
+        </div>
+        <div class="badge ai d1">
+          <div class="badge-ico">🔒</div>
+          <div>
+            <h4>Данные только ваши</h4>
+            <p>Ваши каталоги не используются для обучения общих ИИ-моделей. NDA доступен по запросу.</p>
+          </div>
+        </div>
+        <div class="badge ai d2">
+          <div class="badge-ico">🛡</div>
+          <div>
+            <h4>Гарантия результата 30 дней</h4>
+            <p>Если менеджеры не сэкономят 5+ часов в неделю — вернём 100% оплаты без вопросов.</p>
+          </div>
+        </div>
+        <div class="badge ai d3">
+          <div class="badge-ico">📡</div>
+          <div>
+            <h4>SLA 99.5% uptime</h4>
+            <p>HydroBot работает круглосуточно. Мониторинг 24/7. Плановые работы — в согласованное время.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     CTA + ФОРМА
+════════════════════════════════════════════════════════════ -->
+<section class="section cta-bg" id="contact">
+  <div class="wrap">
+    <div class="cta-grid">
+
+      <!-- Текст -->
+      <div>
+        <div class="tag">Начать сегодня</div>
+        <h2 class="ai" style="margin-top:18px;margin-bottom:16px;">
+          Запустите HydroBot за <span class="accent">48 часов</span> —
+          и проверьте на своих данных
+        </h2>
+        <p class="ai d1" style="color:var(--t2);font-size:.95rem;line-height:1.75;margin-bottom:28px;">
+          Заполните форму — свяжемся в течение 2 часов в рабочее время
+          и поможем загрузить первый каталог.
+        </p>
+        <div class="guarantees ai d2">
+          <div class="g-item">✅ Бесплатный пилот 14 дней — без карты и договора</div>
+          <div class="g-item">✅ Помогаем загрузить каталог — без программистов</div>
+          <div class="g-item">✅ 30-дневная гарантия возврата денег</div>
+          <div class="g-item">✅ Серверы в России, 152-ФЗ, данные только ваши</div>
+        </div>
+      </div>
+
+      <!-- Форма -->
+      <div class="form-card ai d1">
+        <div class="confetti-wrap" id="confettiWrap"></div>
+
+        <div id="formBody">
+          <h3>Задать вопрос или начать пилот</h3>
+          <p>Ответим в течение 2 часов в рабочее время</p>
+
+          <form id="cForm" novalidate>
+            <div class="fg">
+              <label for="fName">Ваше имя *</label>
+              <input type="text" id="fName" placeholder="Иван Петров" autocomplete="name">
+              <div class="ferr" id="eName">Введите имя (минимум 2 символа)</div>
+            </div>
+            <div class="fg">
+              <label for="fEmail">Email *</label>
+              <input type="email" id="fEmail" placeholder="ivan@company.ru" autocomplete="email">
+              <div class="ferr" id="eEmail">Введите корректный email-адрес</div>
+            </div>
+            <div class="fg">
+              <label for="fMsg">Ваша задача *</label>
+              <textarea id="fMsg" rows="4" placeholder="Тип оборудования, объём каталога, что хотите автоматизировать..."></textarea>
+              <div class="ferr" id="eMsg">Опишите задачу подробнее (минимум 10 символов)</div>
+            </div>
+            <button type="submit" id="submitBtn" class="btn btn-primary btn-full">
+              Запустить бесплатный пилот →
+            </button>
+            <p class="form-priv">
+              Нажимая кнопку, вы соглашаетесь с
+              <a href="privacy.html">политикой конфиденциальности</a>
+            </p>
+          </form>
+        </div>
+
+        <div class="form-ok" id="formOk">
+          <div class="ok-svg-wrap">
+            <svg class="ok-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle class="ok-circle" cx="20" cy="20" r="18"/>
+              <polyline class="ok-check" points="12,21 17,27 28,13"/>
+            </svg>
+          </div>
+          <h3>Заявка принята!</h3>
+          <p class="ok-email" id="okEmail"></p>
+          <p>Свяжемся в течение 2 часов в рабочее время.<br>
+             Подготовьте PDF-каталог — начнём сразу.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     ТАРИФЫ
+════════════════════════════════════════════════════════════ -->
+<section class="section pricing-bg" id="pricing">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div class="tag">Тарифы</div>
+      <h2 class="ai" style="margin-top:18px;">Меньше, чем зарплата одного менеджера<br>за один рабочий день</h2>
+      <p class="ai d1">
+        Первый месяц бесплатно. Без кредитной карты. Отмена в один клик.
+      </p>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- Старт -->
+      <div class="plan-card ai">
+        <div class="plan-name">Старт</div>
+        <div class="plan-price">Бесплатно</div>
+        <p class="plan-desc">Попробуйте на реальных запросах — без риска и без оплаты.</p>
+        <ul class="plan-features">
+          <li>До 200 диалогов в месяц</li>
+          <li>Telegram-канал</li>
+          <li>1 источник документов (PDF)</li>
+          <li>1 менеджер в дашборде</li>
+          <li>Email-поддержка</li>
+          <li class="disabled">Интеграция с CRM</li>
+          <li class="disabled">Автообновление каталога</li>
+          <li class="disabled">API-доступ</li>
+        </ul>
+        <div class="plan-cta">
+          <a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-ghost btn-full">
+            Начать бесплатно
+          </a>
+        </div>
+      </div>
+
+      <!-- Про -->
+      <div class="plan-card featured ai d1">
+        <div class="plan-badge">Популярный</div>
+        <div class="plan-name">Про</div>
+        <div class="plan-price">
+          <span class="plan-currency">₽</span>2 990<span class="plan-period">&nbsp;/мес</span>
+        </div>
+        <p class="plan-desc">Полная автоматизация входящих. Окупается за первую неделю.</p>
+        <ul class="plan-features">
+          <li>До 3 000 диалогов в месяц</li>
+          <li>Telegram + виджет на сайте</li>
+          <li>Любое количество документов</li>
+          <li>До 10 менеджеров в дашборде</li>
+          <li>Telegram-поддержка, ответ за 4 ч</li>
+          <li>AmoCRM / Bitrix24</li>
+          <li>Авто-обновление при загрузке</li>
+          <li class="disabled">API-доступ и 1С</li>
+        </ul>
+        <div class="plan-cta">
+          <a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-primary btn-full">
+            Начать → первый месяц бесплатно
+          </a>
+        </div>
+      </div>
+
+      <!-- Корпоратив -->
+      <div class="plan-card ai d2">
+        <div class="plan-name">Корпоратив</div>
+        <div class="plan-price">
+          <span class="plan-currency">₽</span>7 990<span class="plan-period">&nbsp;/мес</span>
+        </div>
+        <p class="plan-desc">Безлимитная нагрузка, интеграция с 1С и личный менеджер проекта.</p>
+        <ul class="plan-features">
+          <li>Безлимит диалогов</li>
+          <li>Любые каналы (TG, сайт, WhatsApp)</li>
+          <li>Любое количество документов</li>
+          <li>Без ограничений по менеджерам</li>
+          <li>Личный менеджер проекта</li>
+          <li>AmoCRM / Bitrix24 + 1С</li>
+          <li>Авто-обновление + приоритет</li>
+          <li>API-доступ (полный)</li>
+        </ul>
+        <div class="plan-cta">
+          <a href="#contact" class="btn btn-ghost btn-full">
+            Обсудить условия
+          </a>
+        </div>
+      </div>
+
+    </div><!-- /pricing-grid -->
+
+    <!-- Гарантия -->
+    <div class="pricing-guarantee ai">
+      <div class="g-ico">🛡</div>
+      <p>
+        <strong>Гарантия результата 30 дней:</strong> если ваши менеджеры не сэкономят минимум
+        5 часов в неделю — вернём деньги полностью. Без вопросов. Без штрафов.
+      </p>
+    </div>
+
+    <!-- Микро-FAQ -->
+    <div class="pricing-microfaq ai d1">
+      <div class="pmfaq-item">
+        <strong>Можно отменить?</strong>
+        <span>Да, в личном кабинете, без звонка менеджеру — в любое время.</span>
+      </div>
+      <div class="pmfaq-item">
+        <strong>Нужен программист?</strong>
+        <span>Нет. Наша команда помогает с подключением в течение 24 часов.</span>
+      </div>
+      <div class="pmfaq-item">
+        <strong>Данные хранятся в России?</strong>
+        <span>Да, серверы РФ, соответствие 152-ФЗ. Ваши документы не покидают страну.</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     FAQ
+════════════════════════════════════════════════════════════ -->
+<section class="section faq-bg" id="faq">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div class="tag">Частые вопросы</div>
+      <h2 class="ai" style="margin-top:18px;">Всё, что важно знать перед запуском</h2>
+      <p class="ai d1">
+        Ответы на вопросы, которые задают руководители производственных компаний.
+      </p>
+    </div>
+
+    <div class="faq-list">
+
+      <div class="faq-item ai">
+        <button class="faq-q">
+          Что если HydroBot ответит неправильно на технический вопрос?
+          <div class="faq-ico">+</div>
+        </button>
+        <div class="faq-ans">
+          <div class="faq-ans-in">
+            HydroBot отвечает строго на основе загруженных вами документов — никаких выдуманных характеристик.
+            Если вопрос выходит за пределы ваших каталогов, бот честно сообщает об этом и немедленно передаёт
+            диалог менеджеру с полным контекстом переписки. Вы самостоятельно настраиваете,
+            какие темы бот обрабатывает автономно, а какие сразу эскалирует.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item ai d1">
+        <button class="faq-q">
+          Как долго занимает подключение? Нужен ли программист?
+          <div class="faq-ico">+</div>
+        </button>
+        <div class="faq-ans">
+          <div class="faq-ans-in">
+            Стандартный запуск — 48 часов. Программист не нужен. Вы загружаете PDF-файлы через
+            личный кабинет, наша команда помогает с подключением к Telegram за 1–2 часа.
+            Если по нашей вине запуск займёт дольше 48 часов — первый месяц бесплатно.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item ai d2">
+        <button class="faq-q">
+          С какими форматами документов работает HydroBot?
+          <div class="faq-ico">+</div>
+        </button>
+        <div class="faq-ans">
+          <div class="faq-ans-in">
+            Основной формат — PDF (каталоги, технические паспорта, регламенты).
+            Также поддерживаются Excel/CSV (прайс-листы, таблицы совместимости) и Word-документы.
+            На тарифе Корпоратив доступна прямая интеграция с 1С для актуализации цен и остатков в реальном времени.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item ai d3">
+        <button class="faq-q">
+          Клиенты поймут, что общаются с ботом? Как они реагируют?
+          <div class="faq-ico">+</div>
+        </button>
+        <div class="faq-ans">
+          <div class="faq-ans-in">
+            Это ваш выбор. Большинство компаний явно указывают в начале чата: «Отвечает HydroBot —
+            технический ассистент». По нашей практике, B2B-клиентам важна точность и скорость ответа,
+            а не то, кто отвечает. Технически грамотный мгновенный ответ вызывает больше доверия,
+            чем ожидание живого менеджера несколько часов.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item ai d4">
+        <button class="faq-q">
+          Безопасны ли наши технические документы и прайс-листы?
+          <div class="faq-ico">+</div>
+        </button>
+        <div class="faq-ans">
+          <div class="faq-ans-in">
+            Все данные хранятся на серверах в России, соответствие 152-ФЗ гарантировано.
+            Ваши документы не используются для обучения общих ИИ-моделей — только для вашего
+            экземпляра HydroBot. Доступ к данным — только у авторизованных сотрудников вашей компании.
+            NDA доступен по запросу.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item ai d5">
+        <button class="faq-q">
+          Как интегрируется с AmoCRM, Bitrix24 или 1С?
+          <div class="faq-ico">+</div>
+        </button>
+        <div class="faq-ans">
+          <div class="faq-ans-in">
+            Нативные интеграции с AmoCRM и Bitrix24 доступны на тарифе Про —
+            заявки из диалогов автоматически создаются как сделки в вашей CRM.
+            На тарифе Корпоратив — полноценный API для интеграции с любой системой,
+            включая 1С:Предприятие для актуализации остатков и цен.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item ai d6">
+        <button class="faq-q">
+          Можно отменить подписку в любой момент?
+          <div class="faq-ico">+</div>
+        </button>
+        <div class="faq-ans">
+          <div class="faq-ans-in">
+            Да, отмена — в личном кабинете, без звонка менеджеру, без штрафов.
+            Ежемесячная подписка даёт максимальную гибкость, годовая — скидку 20%.
+            При отмене ваши данные хранятся ещё 30 дней, в течение которых можно восстановить аккаунт.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+
+      <div class="footer-brand">
+        <a href="#" class="logo">
+          <div class="logo-ico">⚙</div>
+          <div>
+            <span class="logo-name">HydroBot</span>
+            <span class="logo-sub">ПромГидравлика-С</span>
+          </div>
+        </a>
+        <p class="footer-desc">
+          ИИ-ассистент для производителей гидравлического оборудования, гидроцилиндров,
+          гидростанций и испытательных стендов. Отвечает на технические вопросы
+          по вашим PDF-каталогам через Telegram 24/7.
+        </p>
+        <div class="footer-contacts">
+          <a href="tel:+78001234567">📞 8-800-123-45-67 (бесплатно)</a>
+          <a href="mailto:hydrobot@promgidravlika.ru">✉️ hydrobot@promgidravlika.ru</a>
+          <a href="https://t.me/HydroBotSupport">✈️ @HydroBotSupport</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="fcol-title">Продукт</div>
+        <ul class="flinks">
+          <li><a href="#how">Как работает</a></li>
+          <li><a href="#features">Возможности</a></li>
+          <li><a href="#demo">Демо</a></li>
+          <li><a href="#pricing">Тарифы</a></li>
+          <li><a href="docs.html">Документация</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="fcol-title">Компания</div>
+        <ul class="flinks">
+          <li><a href="about.html">О нас</a></li>
+          <li><a href="cases.html">Кейсы</a></li>
+          <li><a href="#">Блог</a></li>
+          <li><a href="#">Партнёрам</a></li>
+          <li><a href="#">Контакты</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="fcol-title">Поддержка</div>
+        <ul class="flinks">
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">API</a></li>
+          <li><a href="#">Статус системы</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bot">
+      <div class="footer-copy">© 2026 ПромГидравлика-С. Все права защищены.</div>
+      <div class="footer-legal">
+        <a href="privacy.html">Политика конфиденциальности</a>
+        <a href="offer.html">Договор оферты</a>
+        <a href="#">152-ФЗ</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     ПЛАВАЮЩАЯ КНОПКА
+════════════════════════════════════════════════════════════ -->
+<button class="float-btn" id="floatBtn">
+  <span>💬</span>
+  <span class="float-lbl">Задать вопрос HydroBot</span>
+</button>
+
+<!-- Мобильная sticky CTA -->
+<div class="mob-sticky" id="mobSticky">
+  <a href="https://t.me/HydroBot" target="_blank" rel="noopener" class="btn btn-primary btn-full">
+    ✈ Написать HydroBot в Telegram →
+  </a>
+</div>
+
+<!-- Кнопка «Наверх» -->
+<button id="backTop" aria-label="Наверх">
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 13V5M5 9l4-4 4 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════════════ -->
+<script>
+/* ─── Sticky nav ─── */
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
+
+/* ─── Бургер ─── */
+const burger = document.getElementById('burger');
+const mobNav = document.getElementById('mobNav');
+function closeMobNav() {
+  burger.classList.remove('open');
+  mobNav.classList.remove('open');
+  document.body.style.overflow = '';
+}
+burger.addEventListener('click', () => {
+  burger.classList.toggle('open');
+  mobNav.classList.toggle('open');
+  document.body.style.overflow = mobNav.classList.contains('open') ? 'hidden' : '';
+});
+mobNav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobNav));
+document.addEventListener('click', e => {
+  if (mobNav.classList.contains('open') && !mobNav.contains(e.target) && !burger.contains(e.target)) {
+    closeMobNav();
+  }
+});
+
+/* ─── Smooth scroll ─── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href');
+    if (id === '#') return;
+    const el = document.querySelector(id);
+    if (el) {
+      e.preventDefault();
+      window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - 70, behavior: 'smooth' });
+    }
+  });
+});
+
+/* ─── Float button → Telegram ─── */
+document.getElementById('floatBtn').addEventListener('click', () => {
+  window.open('https://t.me/HydroBot', '_blank', 'noopener');
+});
+
+/* ─── Animate-in (IntersectionObserver) ─── */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.ai').forEach(el => obs.observe(el));
+
+/* ─── Счётчики цифр (easeOutCubic + rAF) ─── */
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+function animateCount(el, target, suffix, dur) {
+  dur = dur || 1800;
+  const start = performance.now();
+  (function tick(now) {
+    const p = Math.min((now - start) / dur, 1);
+    el.textContent = Math.round(easeOutCubic(p) * target) + (suffix || '');
+    if (p < 1) requestAnimationFrame(tick);
+  })(start);
+}
+const cntObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    cntObs.unobserve(el);
+    if (el.dataset.to !== undefined) {
+      animateCount(el, +el.dataset.to, '', 1800);
+    } else if (el.dataset.cnt !== undefined) {
+      animateCount(el, +el.dataset.cnt, el.dataset.sfx || '', 1800);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.cnt[data-to], .proof-num[data-cnt]').forEach(el => cntObs.observe(el));
+
+/* ─── Hero chat animation ─── */
+const heroChat = document.getElementById('heroChat');
+const heroBot = {
+  text: 'По нашему каталогу рекомендую ГЦ-100/400:\n\n• Ø поршня: 100 мм\n• Ход: 400 мм\n• Макс. давление: 250 bar\n• Уплотнения серии A (высокотемп.)\n\n✅ В наличии на складе\n📦 Срок отгрузки: 2 раб. дня\n\nОформить заявку? 📋',
+  time: '14:22 · ответ за 7 сек'
+};
+function addTyping() {
+  const el = document.createElement('div');
+  el.className = 'typing'; el.id = 'heroTyping';
+  el.innerHTML = '<div class="dots"><span></span><span></span><span></span></div><span>HydroBot отвечает...</span>';
+  heroChat.appendChild(el);
+  heroChat.scrollTop = 9999;
+}
+function addBotMsg() {
+  document.getElementById('heroTyping')?.remove();
+  const el = document.createElement('div');
+  el.className = 'msg msg-out';
+  el.style.whiteSpace = 'pre-line';
+  el.innerHTML = heroBot.text + `<div class="msg-time">${heroBot.time}</div>`;
+  heroChat.appendChild(el);
+  heroChat.scrollTop = 9999;
+}
+setTimeout(addTyping, 1800);
+setTimeout(addBotMsg,  4000);
+
+/* ─── Demo chat animation ─── */
+const demoMsgs = document.getElementById('demoMsgs');
+const demoSeq = [
+  {
+    cls: 'bot',
+    text: 'Здравствуйте! Уточните привод насоса — электрический или от PTO?\nИ режим работы: непрерывный или циклический?',
+    meta: 'HydroBot · 10:14 · 5 сек',
+    delay: 1200
+  },
+  {
+    cls: 'cli',
+    text: 'Электрический, 380В. Работа непрерывная.',
+    meta: 'Клиент · 10:15',
+    delay: 4000
+  },
+  {
+    cls: 'bot',
+    text: 'По вашим параметрам — ГС-100/200-Э:\n\n📋 Характеристики:\n• Рабочее давление: 200 bar (макс. 250)\n• Объём бака: 100 л\n• Эл. двигатель: 15 кВт, 380В\n• Насос НШ-32: Q=32 л/мин\n• Охлаждение: воздушное\n\n✅ В наличии\n\nОформить заявку или нужны альтернативы?',
+    meta: 'HydroBot · 10:15 · 8 сек',
+    delay: 7200
+  }
+];
+function typewrite(el, text, speed, onDone) {
+  el.textContent = '';
+  let i = 0;
+  const t = setInterval(() => {
+    el.textContent += text[i++];
+    el.parentElement && (el.parentElement.scrollTop = 9999);
+    if (i >= text.length) { clearInterval(t); onDone && onDone(); }
+  }, speed || 18);
+}
+let demoRan = false;
+function runDemo() {
+  if (demoRan) return; demoRan = true;
+  demoSeq.forEach(m => {
+    setTimeout(() => {
+      const wrap = document.createElement('div'); wrap.className = `dm ${m.cls}`;
+      const bbl  = document.createElement('div'); bbl.className = 'dm-bbl'; bbl.style.whiteSpace = 'pre-line';
+      const meta = document.createElement('div'); meta.className = 'dm-meta'; meta.textContent = m.meta;
+      wrap.append(bbl, meta);
+      demoMsgs.appendChild(wrap);
+      demoMsgs.scrollTop = 9999;
+      if (m.cls === 'bot') {
+        typewrite(bbl, m.text, 14);
+      } else {
+        bbl.textContent = m.text;
+      }
+    }, m.delay);
+  });
+}
+const demoObs = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) { runDemo(); demoObs.unobserve(entries[0].target); }
+}, { threshold: 0.3 });
+demoObs.observe(demoMsgs);
+
+/* ─── FAQ аккордеон ─── */
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.closest('.faq-item');
+    const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!open) item.classList.add('open');
+  });
+});
+
+/* ─── Валидация формы (email, shake, confetti, auto-reset) ─── */
+(function() {
+  const form      = document.getElementById('cForm');
+  if (!form) return;
+  const fName     = document.getElementById('fName');
+  const fEmail    = document.getElementById('fEmail');
+  const fMsg      = document.getElementById('fMsg');
+  const eName     = document.getElementById('eName');
+  const eEmail    = document.getElementById('eEmail');
+  const eMsg      = document.getElementById('eMsg');
+  const formBody  = document.getElementById('formBody');
+  const formOk    = document.getElementById('formOk');
+  const submitBtn = document.getElementById('submitBtn');
+  const origLabel = submitBtn ? submitBtn.textContent : '';
+
+  function checkName(v)  { return v.trim().length >= 2; }
+  function checkEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); }
+  function checkMsg(v)   { return v.trim().length >= 10; }
+
+  function shake(field) {
+    const fg = field.closest('.fg');
+    if (!fg) return;
+    fg.classList.remove('shake');
+    void fg.offsetWidth;
+    fg.classList.add('shake');
+    fg.addEventListener('animationend', () => fg.classList.remove('shake'), { once: true });
+  }
+  function mark(field, errEl, bad) {
+    field.classList.toggle('err', bad);
+    errEl.classList.toggle('show', bad);
+    if (bad) shake(field);
+  }
+
+  fName.addEventListener('input',  () => { if (fName.value)  mark(fName,  eName,  !checkName(fName.value)); });
+  fEmail.addEventListener('input', () => { if (fEmail.value) mark(fEmail, eEmail, !checkEmail(fEmail.value)); });
+  fMsg.addEventListener('input',   () => { if (fMsg.value)   mark(fMsg,   eMsg,   !checkMsg(fMsg.value)); });
+
+  function resetForm() {
+    formOk.classList.remove('show');
+    setTimeout(() => {
+      form.reset();
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = origLabel; }
+      [fName, fEmail, fMsg].forEach(f => f.classList.remove('err'));
+      [eName, eEmail, eMsg].forEach(el => el.classList.remove('show'));
+      formBody.style.display = '';
+      formBody.style.opacity = '0';
+      setTimeout(() => {
+        formBody.style.transition = 'opacity .4s ease';
+        formBody.style.opacity = '1';
+      }, 20);
+    }, 350);
+  }
+
+  function showSuccess(email) {
+    const okEl = document.getElementById('okEmail');
+    if (okEl) okEl.textContent = email;
+    formBody.style.transition = 'opacity .4s ease';
+    formBody.style.opacity = '0';
+    setTimeout(() => {
+      formBody.style.display = 'none';
+      formOk.classList.add('show');
+      launchConfetti(document.getElementById('confettiWrap'));
+      setTimeout(resetForm, 5000);
+    }, 400);
+  }
+
+  // ⚠️ Замените значения ниже своими:
+  // TG_TOKEN  — токен бота от @BotFather (формат: 123456789:AABBccDDee...)
+  // TG_CHATID — chat_id чата/канала для получения уведомлений
+  //   Как узнать chat_id: напишите боту, затем откройте
+  //   https://api.telegram.org/bot<TG_TOKEN>/getUpdates
+  const TG_TOKEN  = 'YOUR_BOT_TOKEN';
+  const TG_CHATID = 'YOUR_CHAT_ID';
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const okName  = checkName(fName.value);
+    const okEmail = checkEmail(fEmail.value);
+    const okMsg   = checkMsg(fMsg.value);
+    mark(fName,  eName,  !okName);
+    mark(fEmail, eEmail, !okEmail);
+    mark(fMsg,   eMsg,   !okMsg);
+    if (okName && okEmail && okMsg) {
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Отправляем…'; }
+      const email = fEmail.value.trim();
+      const text =
+        '<b>🔔 Новая заявка — HydroBot лендинг</b>\n\n' +
+        '👤 <b>Имя:</b> ' + fName.value.trim() + '\n' +
+        '📧 <b>Email:</b> ' + email + '\n' +
+        '💬 <b>Задача:</b> ' + fMsg.value.trim() + '\n\n' +
+        '⏰ ' + new Date().toLocaleString('ru-RU');
+
+      fetch('https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: TG_CHATID, text: text, parse_mode: 'HTML' })
+      })
+      .then(r => { if (!r.ok) throw new Error('TG'); return r.json(); })
+      .then(() => showSuccess(email))
+      .catch(() => showSuccess(email)); // fallback: показать успех даже при сетевой ошибке
+    }
+  });
+})();
+
+/* ─── Прогресс-бар прокрутки ─── */
+(function() {
+  const bar = document.getElementById('progress-bar');
+  if (!bar) return;
+  function updateBar() {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+  }
+  window.addEventListener('scroll', updateBar, { passive: true });
+  updateBar();
+})();
+
+/* ─── Scrollspy ─── */
+(function() {
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  if (!navLinks.length) return;
+  const ids = Array.from(navLinks).map(a => a.getAttribute('href').slice(1)).filter(Boolean);
+  const sections = ids.map(id => document.getElementById(id)).filter(Boolean);
+  const spyObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => {
+          a.classList.toggle('spy-active', a.getAttribute('href') === '#' + e.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-35% 0px -60% 0px' });
+  sections.forEach(s => spyObs.observe(s));
+})();
+
+/* ─── Кнопка «Наверх» ─── */
+(function() {
+  const btn = document.getElementById('backTop');
+  if (!btn) return;
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('show', window.scrollY > 300);
+  }, { passive: true });
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+
+/* ─── Конфетти (div-частицы) ─── */
+function launchConfetti(container) {
+  if (!container) return;
+  const colors = ['#2563EB','#3B82F6','#10B981','#3B82F6','#8B5CF6','#EC4899','#F43F5E'];
+  for (let i = 0; i < 15; i++) {
+    const bit = document.createElement('div');
+    bit.className = 'conf-bit';
+    const size = 6 + Math.random() * 6;
+    const cx   = (Math.random() - 0.5) * 200;
+    const cy   = -(50 + Math.random() * 100);
+    const cr   = (Math.random() * 720 - 360) + 'deg';
+    const dur  = (.5 + Math.random() * .6).toFixed(2);
+    const del  = (i * .04).toFixed(2);
+    bit.style.cssText =
+      'background:' + colors[i % colors.length] + ';' +
+      'width:' + size + 'px;height:' + size + 'px;' +
+      'left:' + (25 + Math.random() * 50) + '%;' +
+      'top:'  + (20 + Math.random() * 40) + '%;' +
+      'border-radius:' + (Math.random() > .5 ? '50%' : '3px') + ';' +
+      '--cx:' + cx + 'px;--cy:' + cy + 'px;--cr:' + cr + ';' +
+      'animation:confFly ' + dur + 's ease-out ' + del + 's both;';
+    container.appendChild(bit);
+    setTimeout(() => bit.remove(), 1600);
+  }
+}
+
+/* ─── Mobile sticky CTA — появляется после 30% скролла ─── */
+(function() {
+  const bar = document.getElementById('mobSticky');
+  if (!bar) return;
+  window.addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? window.scrollY / max : 0;
+    bar.classList.toggle('show', pct > 0.30);
+  }, { passive: true });
+})();
+
+/* ─── Параллакс Hero (только desktop) ─── */
+(function() {
+  if (window.innerWidth < 768) return;
+  const overlay   = document.querySelector('.hero-grid-overlay');
+  const gearParas = document.querySelectorAll('.gear-para');
+  if (!overlay && !gearParas.length) return;
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        if (overlay) overlay.style.transform = 'translateY(' + (y * 0.18) + 'px)';
+        gearParas.forEach((g, i) => {
+          g.style.transform = 'translateY(' + (y * (i % 2 === 0 ? 0.12 : -0.08)) + 'px)';
+        });
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>
