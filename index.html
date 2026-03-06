@@ -371,8 +371,24 @@
       font-size: .82rem; color: var(--t2); line-height: 1.55;
       padding: 9px 13px; background: var(--bg-3);
       border-radius: 8px; border-left: 2px solid rgba(37,99,235,.4);
+      cursor: pointer; transition: background var(--tr), color var(--tr), border-color var(--tr);
+      user-select: none;
+    }
+    .prod-qs li:hover {
+      background: rgba(37,99,235,.12); color: var(--t1);
+      border-left-color: var(--accent);
     }
     .prod-qs li::before { content: '💬 '; }
+    .prod-qs li:hover::before { content: '→ '; }
+    .prod-btn {
+      display: block; width: 100%; margin-top: 18px;
+      padding: 11px 0; text-align: center;
+      background: rgba(37,99,235,.12); border: 1px solid rgba(37,99,235,.3);
+      border-radius: 8px; font-size: .84rem; font-weight: 600;
+      color: var(--accent); cursor: pointer;
+      transition: background var(--tr), border-color var(--tr);
+    }
+    .prod-btn:hover { background: rgba(37,99,235,.22); border-color: var(--accent); }
 
     /* ============================================================
        STATS
@@ -1120,6 +1136,7 @@
           <li>Какие уплотнения для температуры +120 °C?</li>
           <li>Есть аналог ГЦ-100/400 — что по наличию?</li>
         </ul>
+        <button class="prod-btn" data-prod="Гидроцилиндры">Задать вопрос по гидроцилиндрам →</button>
       </div>
 
       <div class="prod-card ai d1">
@@ -1131,6 +1148,7 @@
           <li>Насос НШ-32 подойдёт для привода от PTO?</li>
           <li>Нужна станция с воздушным охлаждением 380В</li>
         </ul>
+        <button class="prod-btn" data-prod="Гидростанции">Задать вопрос по гидростанциям →</button>
       </div>
 
       <div class="prod-card ai d2">
@@ -1142,6 +1160,7 @@
           <li>Какие датчики давления в базовой комплектации?</li>
           <li>Можно испытывать насосы и моторы на одном стенде?</li>
         </ul>
+        <button class="prod-btn" data-prod="Испытательные стенды">Задать вопрос по стендам →</button>
       </div>
 
     </div>
@@ -1759,6 +1778,34 @@ const demoObs = new IntersectionObserver(entries => {
   if (entries[0].isIntersecting) { runDemo(); demoObs.unobserve(entries[0].target); }
 }, { threshold: 0.3 });
 demoObs.observe(demoMsgs);
+
+/* ─── Продуктовые карточки: клик по вопросу или кнопке → заполнить форму ─── */
+(function() {
+  function fillFormAndScroll(text) {
+    const fMsg = document.getElementById('fMsg');
+    const contact = document.getElementById('contact');
+    if (!fMsg || !contact) return;
+    fMsg.value = text;
+    fMsg.dispatchEvent(new Event('input'));
+    contact.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => fMsg.focus(), 600);
+  }
+
+  /* клик по конкретному вопросу */
+  document.querySelectorAll('.prod-qs li').forEach(li => {
+    li.addEventListener('click', () => {
+      fillFormAndScroll(li.textContent.replace(/^[💬→]\s*/, '').trim());
+    });
+  });
+
+  /* клик по кнопке карточки → вписывает название категории */
+  document.querySelectorAll('.prod-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const prod = btn.dataset.prod || '';
+      fillFormAndScroll('Интересует подбор: ' + prod + '. Уточните, пожалуйста, параметры и наличие.');
+    });
+  });
+})();
 
 /* ─── FAQ аккордеон ─── */
 document.querySelectorAll('.faq-q').forEach(btn => {
