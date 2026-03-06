@@ -640,9 +640,97 @@
       box-shadow: 0 6px 28px rgba(37,99,235,.58);
       transform: translateY(-3px); animation: none;
     }
+    .float-btn.widget-open { border-radius: 50%; width: 52px; height: 52px; padding: 0; justify-content: center; animation: none; }
+    .float-btn.widget-open .float-lbl { display: none; }
     @keyframes fpulse {
       0%,100% { box-shadow: 0 4px 20px rgba(37,99,235,.48); }
       50%      { box-shadow: 0 4px 28px rgba(37,99,235,.7), 0 0 0 7px rgba(37,99,235,.1); }
+    }
+
+    /* ── Чат-виджет ── */
+    .chat-widget {
+      position: fixed; bottom: 90px; right: 26px; z-index: 901;
+      width: 330px;
+      background: var(--bg-2); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 18px;
+      box-shadow: 0 16px 48px rgba(0,0,0,.55);
+      display: flex; flex-direction: column; overflow: hidden;
+      transform: scale(.85) translateY(16px);
+      opacity: 0; pointer-events: none;
+      transition: transform .22s ease, opacity .22s ease;
+      transform-origin: bottom right;
+    }
+    .chat-widget.open { transform: scale(1) translateY(0); opacity: 1; pointer-events: all; }
+    .cw-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 15px; background: var(--bg-3);
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .cw-ava {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      background: var(--accent); display: flex; align-items: center;
+      justify-content: center; font-size: 16px;
+    }
+    .cw-name  { font-size: .88rem; font-weight: 700; color: var(--t1); line-height: 1.2; }
+    .cw-stat  { font-size: .7rem; color: var(--green); }
+    .cw-close {
+      margin-left: auto; background: none; border: none; cursor: pointer;
+      color: var(--t3); width: 30px; height: 30px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; transition: background var(--tr), color var(--tr);
+    }
+    .cw-close:hover { background: rgba(255,255,255,.06); color: var(--t1); }
+    .cw-msgs {
+      flex: 1; overflow-y: auto; padding: 14px 12px;
+      max-height: 260px; min-height: 120px;
+      display: flex; flex-direction: column; gap: 10px;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .cw-msg { display: flex; flex-direction: column; gap: 3px; max-width: 100%; }
+    .cw-msg.cw-user { align-items: flex-end; }
+    .cw-msg.cw-bot  { align-items: flex-start; }
+    .cw-bbl {
+      max-width: 88%; padding: 9px 13px; font-size: .83rem; line-height: 1.55;
+      word-break: break-word;
+    }
+    .cw-bot  .cw-bbl { background: var(--bg-3); color: var(--t1); border-radius: 4px 12px 12px 12px; }
+    .cw-user .cw-bbl { background: var(--accent); color: #fff; border-radius: 12px 4px 12px 12px; }
+    .cw-time { font-size: .67rem; color: var(--t3); padding: 0 3px; }
+    .cw-typing .cw-bbl { display: flex; align-items: center; gap: 5px; padding: 11px 15px; }
+    .cw-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--t3);
+               animation: cwdot 1.3s ease-in-out infinite; }
+    .cw-dot:nth-child(2) { animation-delay: .18s; }
+    .cw-dot:nth-child(3) { animation-delay: .36s; }
+    @keyframes cwdot { 0%,100%{opacity:.3;transform:translateY(0)} 50%{opacity:1;transform:translateY(-3px)} }
+    .cw-footer {
+      display: flex; gap: 8px; padding: 10px 12px;
+      border-top: 1px solid var(--border); flex-shrink: 0;
+    }
+    #cwInput {
+      flex: 1; background: var(--bg-3); border: 1px solid var(--border);
+      border-radius: 10px; padding: 9px 12px; font-size: .85rem;
+      color: var(--t1); outline: none; font-family: inherit;
+      transition: border-color var(--tr); resize: none; min-height: 38px; max-height: 80px;
+    }
+    #cwInput:focus { border-color: rgba(37,99,235,.5); }
+    #cwInput::placeholder { color: var(--t3); }
+    #cwSend {
+      width: 38px; height: 38px; border-radius: 10px; border: none; flex-shrink: 0;
+      background: var(--accent); color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .95rem; transition: background var(--tr), opacity var(--tr);
+    }
+    #cwSend:hover  { background: var(--accent-h); }
+    #cwSend:disabled { opacity: .4; cursor: default; }
+    .cw-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 10px; }
+    .cw-chip {
+      font-size: .73rem; padding: 5px 10px; border-radius: 20px; cursor: pointer;
+      background: rgba(37,99,235,.1); border: 1px solid rgba(37,99,235,.25); color: var(--t2);
+      transition: background var(--tr), color var(--tr); white-space: nowrap;
+    }
+    .cw-chip:hover { background: rgba(37,99,235,.2); color: var(--t1); }
+    @media (max-width: 480px) {
+      .chat-widget { width: calc(100vw - 20px); right: 10px; bottom: 78px; }
     }
 
     /* ============================================================
@@ -1596,11 +1684,37 @@
 
 
 <!-- ════════════════════════════════════════════════════════════
-     ПЛАВАЮЩАЯ КНОПКА
+     ЧАТ-ВИДЖЕТ
 ════════════════════════════════════════════════════════════ -->
+<div class="chat-widget" id="chatWidget" role="dialog" aria-label="Чат ПРОМГИДРАВЛИКА">
+  <div class="cw-head">
+    <div class="cw-ava">⚙</div>
+    <div>
+      <div class="cw-name">ПРОМГИДРАВЛИКА</div>
+      <div class="cw-stat">● онлайн — ответим за 10 мин</div>
+    </div>
+    <button class="cw-close" id="cwClose" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="cw-msgs" id="cwMsgs">
+    <div class="cw-msg cw-bot">
+      <div class="cw-bbl">Здравствуйте! Задайте вопрос по гидроцилиндрам, гидростанциям или испытательным стендам — ответим в течение 10 минут.</div>
+      <div class="cw-time">сейчас</div>
+    </div>
+  </div>
+  <div class="cw-chips" id="cwChips">
+    <span class="cw-chip">🔩 Гидроцилиндры</span>
+    <span class="cw-chip">⚙️ Гидростанции</span>
+    <span class="cw-chip">🧪 Стенды</span>
+  </div>
+  <div class="cw-footer">
+    <textarea id="cwInput" placeholder="Ваш вопрос..." rows="1" maxlength="600"></textarea>
+    <button id="cwSend" aria-label="Отправить">➤</button>
+  </div>
+</div>
+
 <button class="float-btn" id="floatBtn">
-  <span>💬</span>
-  <span class="float-lbl">Задать вопрос HydroBot</span>
+  <span id="floatIco">💬</span>
+  <span class="float-lbl">Задать вопрос</span>
 </button>
 
 <!-- Мобильная sticky CTA -->
@@ -1662,9 +1776,103 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 });
 
 /* ─── Float button → Telegram ─── */
-document.getElementById('floatBtn').addEventListener('click', () => {
-  window.open('https://t.me/HydroBot', '_blank', 'noopener');
-});
+/* ─── Чат-виджет ─── */
+(function() {
+  const TG_TOKEN  = '8132230517:AAGA8qWyUDEl_FxduK0hTXf19hUPcqSPPF4';
+  const TG_CHATID = '499622919';
+
+  const widget   = document.getElementById('chatWidget');
+  const floatBtn = document.getElementById('floatBtn');
+  const floatIco = document.getElementById('floatIco');
+  const closeBtn = document.getElementById('cwClose');
+  const msgsEl   = document.getElementById('cwMsgs');
+  const input    = document.getElementById('cwInput');
+  const sendBtn  = document.getElementById('cwSend');
+  const chips    = document.getElementById('cwChips');
+  if (!widget) return;
+
+  function timeNow() {
+    return new Date().toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+  }
+
+  function openWidget() {
+    widget.classList.add('open');
+    floatBtn.classList.add('widget-open');
+    floatIco.textContent = '✕';
+    setTimeout(() => input.focus(), 200);
+  }
+  function closeWidget() {
+    widget.classList.remove('open');
+    floatBtn.classList.remove('widget-open');
+    floatIco.textContent = '💬';
+  }
+
+  floatBtn.addEventListener('click', () => widget.classList.contains('open') ? closeWidget() : openWidget());
+  closeBtn.addEventListener('click', closeWidget);
+
+  function addMsg(html, side) {
+    const wrap = document.createElement('div');
+    wrap.className = 'cw-msg cw-' + side;
+    wrap.innerHTML = `<div class="cw-bbl">${html}</div><div class="cw-time">${timeNow()}</div>`;
+    msgsEl.appendChild(wrap);
+    msgsEl.scrollTop = 9999;
+    return wrap;
+  }
+  function addTyping() {
+    const wrap = document.createElement('div');
+    wrap.className = 'cw-msg cw-bot cw-typing';
+    wrap.innerHTML = '<div class="cw-bbl"><span class="cw-dot"></span><span class="cw-dot"></span><span class="cw-dot"></span></div>';
+    msgsEl.appendChild(wrap);
+    msgsEl.scrollTop = 9999;
+    return wrap;
+  }
+
+  function send() {
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = ''; input.style.height = '';
+    sendBtn.disabled = true;
+    if (chips) chips.style.display = 'none';
+    addMsg(text.replace(/</g,'&lt;'), 'user');
+    const typing = addTyping();
+    const tgText = `💬 Вопрос через виджет на сайте:\n\n${text}`;
+    fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({chat_id: TG_CHATID, text: tgText})
+    })
+    .then(() => {
+      typing.remove();
+      addMsg('Вопрос получен! Ответим в течение 10 минут. ✅', 'bot');
+    })
+    .catch(() => {
+      typing.remove();
+      addMsg('Не удалось отправить. Попробуйте ещё раз или напишите на email.', 'bot');
+    })
+    .finally(() => { sendBtn.disabled = false; });
+  }
+
+  sendBtn.addEventListener('click', send);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+  /* Авто-resize textarea */
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 80) + 'px';
+  });
+
+  /* Чипы быстрых тем */
+  if (chips) {
+    chips.querySelectorAll('.cw-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        input.value = chip.textContent.replace(/^[🔩⚙️🧪]\s*/, '').trim() + ' — ';
+        chips.style.display = 'none';
+        input.focus();
+      });
+    });
+  }
+})();
 
 /* ─── Animate-in (IntersectionObserver) ─── */
 const obs = new IntersectionObserver(entries => {
