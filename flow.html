@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сценарный Flow Telegram-бота — ПРОМГИДРАВЛИКА</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,600;0,14..32,700;0,14..32,800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue:   #2563EB;
+      --blue-l: #EFF4FF;
+      --blue-d: #1D4ED8;
+      --green:  #10B981;
+      --green-l:#ECFDF5;
+      --red:    #EF4444;
+      --red-l:  #FEF2F2;
+      --yellow: #F59E0B;
+      --yellow-l:#FFFBEB;
+      --gray:   #64748B;
+      --gray-l: #F8FAFC;
+      --border: #E2E8F0;
+      --text:   #0F172A;
+      --text2:  #475569;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #F1F5F9; color: var(--text);
+      font-size: 14px; line-height: 1.6;
+    }
+
+    /* ── Page ── */
+    .page {
+      max-width: 960px; margin: 0 auto;
+      background: #fff; padding: 0;
+    }
+
+    /* ── Cover ── */
+    .cover {
+      background: linear-gradient(135deg, #0D1B2A 0%, #1a3a5c 100%);
+      color: #fff; padding: 64px 60px 56px; position: relative; overflow: hidden;
+    }
+    .cover::before {
+      content: '⚙'; position: absolute; right: -40px; top: -40px;
+      font-size: 260px; opacity: .04; line-height: 1;
+    }
+    .cover-badge {
+      display: inline-block; background: rgba(37,99,235,.3);
+      border: 1px solid rgba(37,99,235,.5); color: #93C5FD;
+      font-size: 11px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; padding: 4px 14px; border-radius: 20px;
+      margin-bottom: 24px;
+    }
+    .cover h1 {
+      font-size: 36px; font-weight: 800; line-height: 1.2;
+      margin-bottom: 16px; max-width: 620px;
+    }
+    .cover h1 span { color: #60A5FA; }
+    .cover p { font-size: 16px; color: #94A3B8; max-width: 520px; line-height: 1.7; }
+    .cover-meta {
+      display: flex; gap: 32px; margin-top: 40px;
+      padding-top: 32px; border-top: 1px solid rgba(255,255,255,.1);
+    }
+    .cover-meta-item { display: flex; flex-direction: column; gap: 3px; }
+    .cover-meta-label { font-size: 11px; color: #64748B; text-transform: uppercase; letter-spacing: .08em; }
+    .cover-meta-value { font-size: 15px; font-weight: 700; color: #F0F6FC; }
+
+    /* ── Section ── */
+    .section { padding: 48px 60px; border-bottom: 1px solid var(--border); }
+    .section:last-child { border-bottom: none; }
+    .section-title {
+      font-size: 11px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--blue); margin-bottom: 8px;
+    }
+    .section h2 {
+      font-size: 24px; font-weight: 800; margin-bottom: 24px; color: var(--text);
+    }
+
+    /* ── CJM Table ── */
+    .cjm { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    .cjm th {
+      background: var(--blue); color: #fff; padding: 12px 14px;
+      font-size: 12px; font-weight: 700; text-align: left;
+    }
+    .cjm th:first-child { border-radius: 8px 0 0 0; }
+    .cjm th:last-child { border-radius: 0 8px 0 0; }
+    .cjm td {
+      padding: 12px 14px; border-bottom: 1px solid var(--border);
+      font-size: 13px; vertical-align: top;
+    }
+    .cjm tr:nth-child(even) td { background: var(--gray-l); }
+    .cjm tr:hover td { background: var(--blue-l); }
+    .cjm .stage-name { font-weight: 700; color: var(--text); white-space: nowrap; }
+    .badge {
+      display: inline-block; padding: 2px 9px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+    }
+    .badge-red    { background: var(--red-l);    color: var(--red); }
+    .badge-yellow { background: var(--yellow-l); color: #92400E; }
+    .badge-green  { background: var(--green-l);  color: #065F46; }
+    .badge-blue   { background: var(--blue-l);   color: var(--blue-d); }
+
+    /* ── Flow Diagram ── */
+    .flow-diagram { margin: 8px 0 0; }
+    .flow-row { display: flex; align-items: flex-start; gap: 0; margin-bottom: 0; }
+    .flow-node {
+      flex: 1; background: var(--gray-l); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 14px 12px; text-align: center;
+      position: relative; min-width: 0;
+    }
+    .flow-node.blue  { background: var(--blue-l);   border-color: #BFDBFE; }
+    .flow-node.green { background: var(--green-l);  border-color: #A7F3D0; }
+    .flow-node.red   { background: var(--red-l);    border-color: #FECACA; }
+    .flow-node.yellow{ background: var(--yellow-l); border-color: #FDE68A; }
+    .flow-node-ico { font-size: 22px; margin-bottom: 6px; }
+    .flow-node-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .flow-node-sub   { font-size: 11px; color: var(--text2); line-height: 1.4; }
+    .flow-arrow {
+      display: flex; align-items: center; padding: 0 4px;
+      flex-shrink: 0; color: var(--gray); font-size: 18px; margin-top: 24px;
+    }
+    .flow-down {
+      display: flex; justify-content: center; align-items: center;
+      height: 28px; color: var(--gray); font-size: 18px;
+    }
+    .flow-branch {
+      display: flex; gap: 8px; margin-top: 8px;
+    }
+    .flow-branch-node {
+      flex: 1; padding: 10px 8px; border-radius: 8px; text-align: center;
+      border: 1.5px solid; font-size: 11px; font-weight: 600;
+    }
+    .flow-branch-node.cyl  { background: #EFF4FF; border-color: #BFDBFE; color: #1D4ED8; }
+    .flow-branch-node.stat { background: #F0FDF4; border-color: #A7F3D0; color: #065F46; }
+    .flow-branch-node.stnd { background: #FFF7ED; border-color: #FED7AA; color: #9A3412; }
+    .flow-branch-node.free { background: #F8FAFC; border-color: #CBD5E1; color: #475569; }
+    .flow-branch-ico { font-size: 18px; display: block; margin-bottom: 3px; }
+
+    /* ── Bot Blocks ── */
+    .blocks-grid { display: flex; flex-direction: column; gap: 20px; }
+    .block-card {
+      border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden;
+    }
+    .block-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 18px; background: var(--gray-l);
+      border-bottom: 1px solid var(--border);
+    }
+    .block-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--blue); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; flex-shrink: 0;
+    }
+    .block-num.green  { background: var(--green); }
+    .block-num.orange { background: var(--yellow); color: #fff; }
+    .block-num.red    { background: var(--red); }
+    .block-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .block-trigger {
+      margin-left: auto; font-size: 11px; color: var(--gray);
+      background: #fff; border: 1px solid var(--border);
+      padding: 2px 9px; border-radius: 20px; white-space: nowrap;
+    }
+    .block-body { padding: 18px; display: flex; gap: 20px; }
+    .block-msg-wrap { flex: 1; min-width: 0; }
+    .tg-bubble {
+      background: #F0F4FF; border-radius: 4px 14px 14px 14px;
+      padding: 12px 15px; font-size: 13px; line-height: 1.65;
+      color: var(--text); max-width: 360px; white-space: pre-line;
+      border: 1px solid #DBEAFE;
+    }
+    .tg-bubble.manager {
+      background: #FFF7ED; border-color: #FED7AA; border-radius: 14px;
+    }
+    .tg-meta { font-size: 11px; color: var(--gray); margin-top: 5px; padding-left: 4px; }
+    .block-btns { display: flex; flex-direction: column; gap: 6px; justify-content: flex-start; min-width: 180px; }
+    .tg-btn {
+      background: #fff; border: 1.5px solid #BFDBFE;
+      border-radius: 8px; padding: 7px 12px;
+      font-size: 12px; font-weight: 600; color: var(--blue-d);
+      display: flex; align-items: center; justify-content: space-between; gap: 6px;
+    }
+    .tg-btn .arrow { color: var(--gray); font-size: 10px; white-space: nowrap; }
+    .block-var {
+      font-size: 11px; color: var(--gray);
+      padding: 8px 12px; background: #F8FAFC;
+      border-top: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    }
+    .var-tag {
+      background: #EFF4FF; color: var(--blue-d);
+      border: 1px solid #BFDBFE; border-radius: 4px;
+      padding: 2px 7px; font-size: 11px; font-weight: 600;
+      font-family: monospace;
+    }
+
+    /* ── Follow-up Timeline ── */
+    .timeline { display: flex; flex-direction: column; gap: 0; position: relative; }
+    .timeline::before {
+      content: ''; position: absolute; left: 28px; top: 0; bottom: 0;
+      width: 2px; background: var(--border);
+    }
+    .tl-item { display: flex; gap: 20px; padding-bottom: 28px; position: relative; }
+    .tl-dot {
+      width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: #fff;
+      position: relative; z-index: 1;
+    }
+    .tl-dot.d0  { background: var(--blue); }
+    .tl-dot.d1  { background: var(--green); }
+    .tl-dot.d3  { background: var(--yellow); }
+    .tl-dot.d7  { background: var(--red); }
+    .tl-dot.d60 { background: var(--gray); }
+    .tl-content { flex: 1; padding-top: 10px; }
+    .tl-label { font-size: 12px; font-weight: 700; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
+    .tl-msg {
+      background: #F0F4FF; border-radius: 4px 14px 14px 14px;
+      padding: 12px 15px; font-size: 13px; line-height: 1.65;
+      max-width: 500px; border: 1px solid #DBEAFE;
+      white-space: pre-line;
+    }
+    .tl-btns { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .tl-btn {
+      background: #fff; border: 1.5px solid #BFDBFE;
+      border-radius: 8px; padding: 6px 12px;
+      font-size: 12px; font-weight: 600; color: var(--blue-d);
+    }
+
+    /* ── Scoring ── */
+    .scoring-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .score-card {
+      border-radius: 10px; padding: 18px; border: 1.5px solid;
+    }
+    .score-card.hot    { background: var(--red-l);    border-color: #FECACA; }
+    .score-card.warm   { background: var(--yellow-l); border-color: #FDE68A; }
+    .score-card.cold   { background: var(--blue-l);   border-color: #BFDBFE; }
+    .score-label { font-size: 15px; font-weight: 800; margin-bottom: 10px; }
+    .score-card.hot  .score-label  { color: var(--red); }
+    .score-card.warm .score-label  { color: #92400E; }
+    .score-card.cold .score-label  { color: var(--blue-d); }
+    .score-item { font-size: 12px; color: var(--text2); margin-bottom: 5px; padding-left: 14px; position: relative; }
+    .score-item::before { content: '•'; position: absolute; left: 4px; }
+    .score-action {
+      margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,.08);
+      font-size: 12px; font-weight: 700;
+    }
+    .score-card.hot  .score-action { color: var(--red); }
+    .score-card.warm .score-action { color: #92400E; }
+    .score-card.cold .score-action { color: var(--blue-d); }
+
+    /* ── CRM Scheme ── */
+    .crm-flow {
+      display: flex; align-items: center; gap: 0;
+      background: var(--gray-l); border-radius: 12px;
+      padding: 24px; overflow-x: auto;
+    }
+    .crm-node {
+      flex-shrink: 0; background: #fff; border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 12px 16px; text-align: center;
+      min-width: 110px;
+    }
+    .crm-node-ico { font-size: 22px; margin-bottom: 5px; }
+    .crm-node-name { font-size: 12px; font-weight: 700; color: var(--text); }
+    .crm-node-sub  { font-size: 11px; color: var(--text2); margin-top: 2px; }
+    .crm-arrow { padding: 0 8px; color: var(--gray); font-size: 20px; flex-shrink: 0; }
+    .crm-node.highlight { border-color: var(--blue); background: var(--blue-l); }
+    .crm-node.highlight .crm-node-name { color: var(--blue-d); }
+
+    /* ── Roadmap ── */
+    .roadmap { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+    .rm-card {
+      border-radius: 10px; border: 1.5px solid var(--border);
+      padding: 16px; background: #fff;
+    }
+    .rm-week {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--gray); margin-bottom: 8px;
+    }
+    .rm-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .rm-item { font-size: 12px; color: var(--text2); padding-left: 14px; position: relative; margin-bottom: 5px; }
+    .rm-item::before { content: '→'; position: absolute; left: 0; color: var(--blue); font-weight: 700; }
+
+    /* ── Stack ── */
+    .stack-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .stack-card {
+      border-radius: 10px; border: 1.5px solid var(--border);
+      padding: 16px;
+    }
+    .stack-tool { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .stack-desc { font-size: 12px; color: var(--text2); margin-bottom: 8px; line-height: 1.5; }
+    .stack-price { font-size: 12px; font-weight: 700; color: var(--blue-d); }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; font-size: 12px; }
+      .page { max-width: 100%; box-shadow: none; }
+      .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 40px; }
+      .section { padding: 32px 40px; break-inside: avoid; }
+      .block-card { break-inside: avoid; }
+      .tl-item { break-inside: avoid; }
+      .no-print { display: none; }
+    }
+    @media (max-width: 768px) {
+      .cover { padding: 36px 24px; }
+      .section { padding: 32px 24px; }
+      .cover h1 { font-size: 24px; }
+      .cover-meta { flex-wrap: wrap; gap: 16px; }
+      .block-body { flex-direction: column; }
+      .block-btns { min-width: unset; flex-direction: row; flex-wrap: wrap; }
+      .scoring-grid { grid-template-columns: 1fr; }
+      .roadmap { grid-template-columns: 1fr 1fr; }
+      .stack-grid { grid-template-columns: 1fr; }
+      .crm-flow { flex-direction: column; align-items: stretch; }
+      .crm-arrow { transform: rotate(90deg); text-align: center; }
+      .flow-arrow { display: none; }
+    }
+
+    /* ── Print button ── */
+    .print-bar {
+      background: var(--blue); color: #fff;
+      padding: 12px 24px; display: flex; align-items: center;
+      justify-content: space-between; gap: 12px;
+      font-size: 13px; font-weight: 600;
+    }
+    .print-btn {
+      background: #fff; color: var(--blue-d); border: none;
+      border-radius: 8px; padding: 8px 18px; font-size: 13px;
+      font-weight: 700; cursor: pointer;
+    }
+    .print-btn:hover { background: #EFF4FF; }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Print bar -->
+  <div class="print-bar no-print">
+    <span>📄 Сценарный Flow Telegram-бота ПРОМГИДРАВЛИКА</span>
+    <button class="print-btn" onclick="window.print()">🖨 Сохранить PDF</button>
+  </div>
+
+  <!-- Cover -->
+  <div class="cover">
+    <div class="cover-badge">Стратегический документ</div>
+    <h1>Сценарный Flow<br><span>Telegram-бота</span><br>ПРОМГИДРАВЛИКА</h1>
+    <p>Квалификация → CRM → Follow-up.<br>
+       Полный сценарий диалогов, скоринг лидов,
+       интеграция с AmoCRM и цепочки дожима.</p>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Компания</span>
+        <span class="cover-meta-value">ПРОМГИДРАВЛИКА</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Бот</span>
+        <span class="cover-meta-value">@PromgidravlikaBot</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Продукты</span>
+        <span class="cover-meta-value">ГЦ · ГС · Стенды</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Версия</span>
+        <span class="cover-meta-value">1.0 · 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CJM -->
+  <div class="section">
+    <div class="section-title">Раздел 1</div>
+    <h2>Customer Journey Map</h2>
+    <table class="cjm">
+      <thead>
+        <tr>
+          <th>Этап</th>
+          <th>Что делает клиент</th>
+          <th>Точка входа</th>
+          <th>Работа бота (JTBD)</th>
+          <th>Статус лида</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="stage-name">1. Осознание</span></td>
+          <td>Сломался ГЦ или нужна ГС для нового пресса. Ищет в Яндексе.</td>
+          <td>Поиск → Сайт → Виджет</td>
+          <td>Приветствие, выбор категории</td>
+          <td><span class="badge badge-blue">Холодный 🔵</span></td>
+        </tr>
+        <tr>
+          <td><span class="stage-name">2. Исследование</span></td>
+          <td>Изучает характеристики, задаёт технические вопросы по давлению / ходу.</td>
+          <td>Telegram @PromgidravlikaBot</td>
+          <td>Отвечает из каталога, уточняет параметры</td>
+          <td><span class="badge badge-blue">Холодный 🔵</span></td>
+        </tr>
+        <tr>
+          <td><span class="stage-name">3. Квалификация</span></td>
+          <td>Уточняет детали: тип, давление, срок, применение.</td>
+          <td>Flow бота (блоки 2–6)</td>
+          <td>Задаёт 4–5 вопросов, собирает параметры, скорит лид</td>
+          <td><span class="badge badge-yellow">Тёплый 🟡</span></td>
+        </tr>
+        <tr>
+          <td><span class="stage-name">4. Намерение</span></td>
+          <td>Называет компанию и телефон, запрашивает КП или наличие.</td>
+          <td>Блок 6–8 flow</td>
+          <td>Фиксирует контакт → пуш в CRM → уведомление менеджеру</td>
+          <td><span class="badge badge-red">Горячий 🔴</span></td>
+        </tr>
+        <tr>
+          <td><span class="stage-name">5. Решение</span></td>
+          <td>Ждёт звонка. Менеджер перезванивает, закрывает сделку.</td>
+          <td>Звонок менеджера из CRM</td>
+          <td>Follow-up если нет ответа: День 1 / 3 / 7</td>
+          <td><span class="badge badge-green">Сделка ✅</span></td>
+        </tr>
+        <tr>
+          <td><span class="stage-name">6. Удержание</span></td>
+          <td>Стал клиентом. Новые задачи — снова пишет боту.</td>
+          <td>Прямой Telegram</td>
+          <td>Реактивация через 60 дней при статусе «отказ»</td>
+          <td><span class="badge badge-green">Клиент 🤝</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Flow Diagram -->
+  <div class="section">
+    <div class="section-title">Раздел 2</div>
+    <h2>Схема flow диалога</h2>
+
+    <div class="flow-diagram">
+
+      <!-- Row 1: Start -->
+      <div style="display:flex;justify-content:center;margin-bottom:4px;">
+        <div class="flow-node blue" style="max-width:220px;text-align:center;">
+          <div class="flow-node-ico">👋</div>
+          <div class="flow-node-title">СТАРТ</div>
+          <div class="flow-node-sub">/start или первое сообщение</div>
+        </div>
+      </div>
+      <div class="flow-down">↓</div>
+
+      <!-- Row 2: Category -->
+      <div style="display:flex;justify-content:center;margin-bottom:4px;">
+        <div class="flow-node" style="max-width:280px;text-align:center;">
+          <div class="flow-node-ico">📋</div>
+          <div class="flow-node-title">Выбор категории</div>
+          <div class="flow-node-sub">4 кнопки-темы</div>
+        </div>
+      </div>
+      <div class="flow-down">↓</div>
+
+      <!-- Row 3: Branches -->
+      <div class="flow-branch">
+        <div class="flow-branch-node cyl">
+          <span class="flow-branch-ico">🔩</span>
+          Гидроцилиндры<br>
+          <small style="font-weight:400;font-size:10px;">давление→ход→цель</small>
+        </div>
+        <div class="flow-branch-node stat">
+          <span class="flow-branch-ico">⚙️</span>
+          Гидростанции<br>
+          <small style="font-weight:400;font-size:10px;">усилие→давление→привод</small>
+        </div>
+        <div class="flow-branch-node stnd">
+          <span class="flow-branch-ico">🧪</span>
+          Стенды<br>
+          <small style="font-weight:400;font-size:10px;">тип→давление→объём</small>
+        </div>
+        <div class="flow-branch-node free">
+          <span class="flow-branch-ico">💬</span>
+          Другой вопрос<br>
+          <small style="font-weight:400;font-size:10px;">свободный ввод</small>
+        </div>
+      </div>
+      <div class="flow-down">↓ все ветки сходятся</div>
+
+      <!-- Row 4: Срок -->
+      <div style="display:flex;justify-content:center;margin-bottom:4px;">
+        <div class="flow-node yellow" style="max-width:280px;text-align:center;">
+          <div class="flow-node-ico">⏱</div>
+          <div class="flow-node-title">Срок и приоритет</div>
+          <div class="flow-node-sub">До 5 дней / 1–2 нед / Прорабатываем</div>
+        </div>
+      </div>
+      <div class="flow-down">↓</div>
+
+      <!-- Row 5: Contact -->
+      <div style="display:flex;justify-content:center;margin-bottom:4px;">
+        <div class="flow-node blue" style="max-width:280px;text-align:center;">
+          <div class="flow-node-ico">👤</div>
+          <div class="flow-node-title">Сбор контакта</div>
+          <div class="flow-node-sub">Имя + Компания + Телефон</div>
+        </div>
+      </div>
+      <div class="flow-down">↓</div>
+
+      <!-- Row 6: Split confirm + CRM -->
+      <div class="flow-row" style="gap:12px;">
+        <div class="flow-node green" style="text-align:center;">
+          <div class="flow-node-ico">✅</div>
+          <div class="flow-node-title">Подтверждение клиенту</div>
+          <div class="flow-node-sub">«Принято. Ответим за 10 мин»</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" style="text-align:center;">
+          <div class="flow-node-ico">📊</div>
+          <div class="flow-node-title">Пуш в CRM</div>
+          <div class="flow-node-sub">Контакт + Сделка + Тег</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node red" style="text-align:center;">
+          <div class="flow-node-ico">🔔</div>
+          <div class="flow-node-title">Уведомление менеджеру</div>
+          <div class="flow-node-sub">🔴/🟡/🔵 + кнопки</div>
+        </div>
+      </div>
+      <div class="flow-down">↓ если нет реакции</div>
+
+      <!-- Row 7: Follow-up -->
+      <div class="flow-row" style="gap:12px;">
+        <div class="flow-node" style="text-align:center;background:#ECFDF5;border-color:#A7F3D0;">
+          <div class="flow-node-ico">📩</div>
+          <div class="flow-node-title">Follow-up День 1</div>
+          <div class="flow-node-sub">«Успели ознакомиться?»</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" style="text-align:center;background:#FFFBEB;border-color:#FDE68A;">
+          <div class="flow-node-ico">📦</div>
+          <div class="flow-node-title">Follow-up День 3</div>
+          <div class="flow-node-sub">«Позиции на складе»</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" style="text-align:center;background:#FEF2F2;border-color:#FECACA;">
+          <div class="flow-node-ico">🎯</div>
+          <div class="flow-node-title">Follow-up День 7</div>
+          <div class="flow-node-sub">«Бесплатный расчёт»</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scoring -->
+  <div class="section">
+    <div class="section-title">Раздел 3</div>
+    <h2>Скоринг лидов</h2>
+    <div class="scoring-grid">
+      <div class="score-card hot">
+        <div class="score-label">🔴 Горячий</div>
+        <div class="score-item">Срок до 5 дней</div>
+        <div class="score-item">Цель: замена сломанного</div>
+        <div class="score-item">Знает параметры</div>
+        <div class="score-item">Назвал компанию и телефон</div>
+        <div class="score-action">→ Уведомить менеджера СРОЧНО.<br>Перезвонить за 10 минут.</div>
+      </div>
+      <div class="score-card warm">
+        <div class="score-label">🟡 Тёплый</div>
+        <div class="score-item">Срок 1–2 недели</div>
+        <div class="score-item">Новый проект в проработке</div>
+        <div class="score-item">Параметры частично известны</div>
+        <div class="score-item">Оставил контакт</div>
+        <div class="score-action">→ Задача менеджеру на сегодня.<br>Follow-up День 1.</div>
+      </div>
+      <div class="score-card cold">
+        <div class="score-label">🔵 Холодный</div>
+        <div class="score-item">Срок не определён</div>
+        <div class="score-item">Только изучают рынок</div>
+        <div class="score-item">Не назвали компанию</div>
+        <div class="score-item">Параметры неизвестны</div>
+        <div class="score-action">→ Отправить PDF каталог.<br>Follow-up через 3 дня.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bot Blocks -->
+  <div class="section">
+    <div class="section-title">Раздел 4</div>
+    <h2>Блоки сообщений — текст для BotHelp</h2>
+    <div class="blocks-grid">
+
+      <!-- Block 1 -->
+      <div class="block-card">
+        <div class="block-head">
+          <div class="block-num">1</div>
+          <span class="block-name">СТАРТ — Приветствие</span>
+          <span class="block-trigger">Триггер: /start</span>
+        </div>
+        <div class="block-body">
+          <div class="block-msg-wrap">
+            <div class="tg-bubble">Здравствуйте! 👋
+
+Я ассистент компании ПРОМГИДРАВЛИКА.
+Помогу подобрать оборудование или отвечу на технический вопрос по каталогу.
+
+Что вас интересует?</div>
+            <div class="tg-meta">Бот → Клиент</div>
+          </div>
+          <div class="block-btns">
+            <div class="tg-btn">🔩 Гидроцилиндры <span class="arrow">→ Блок 2а</span></div>
+            <div class="tg-btn">⚙️ Гидростанции <span class="arrow">→ Блок 2б</span></div>
+            <div class="tg-btn">🧪 Испытательные стенды <span class="arrow">→ Блок 2в</span></div>
+            <div class="tg-btn">💬 Другой вопрос <span class="arrow">→ Блок 2г</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 2a -->
+      <div class="block-card">
+        <div class="block-head">
+          <div class="block-num">2а</div>
+          <span class="block-name">Квалификация — Гидроцилиндры</span>
+        </div>
+        <div class="block-body">
+          <div class="block-msg-wrap">
+            <div class="tg-bubble">Хорошо, подберём гидроцилиндр. 🔩
+
+Какое рабочее давление вам нужно?</div>
+          </div>
+          <div class="block-btns">
+            <div class="tg-btn">До 160 bar <span class="arrow">→ Блок 3а</span></div>
+            <div class="tg-btn">160–250 bar <span class="arrow">→ Блок 3а</span></div>
+            <div class="tg-btn">250–400 bar <span class="arrow">→ Блок 3а</span></div>
+            <div class="tg-btn">Не знаю, помогите <span class="arrow">→ Блок 3а-help</span></div>
+          </div>
+        </div>
+        <div class="block-var">💾 Сохранить: <span class="var-tag">категория = Гидроцилиндры</span></div>
+      </div>
+
+      <!-- Block 3a -->
+      <div class="block-card">
+        <div class="block-head">
+          <div class="block-num">3а</div>
+          <span class="block-name">Ход штока</span>
+        </div>
+        <div class="block-body">
+          <div class="block-msg-wrap">
+            <div class="tg-bubble">Понял. Ход штока?</div>
+          </div>
+          <div class="block-btns">
+            <div class="tg-btn">До 300 мм <span class="arrow">→ Блок 4а</span></div>
+            <div class="tg-btn">300–600 мм <span class="arrow">→ Блок 4а</span></div>
+            <div class="tg-btn">Более 600 мм <span class="arrow">→ Блок 4а</span></div>
+            <div class="tg-btn">Уточню позже <span class="arrow">→ Блок 4а</span></div>
+          </div>
+        </div>
+        <div class="block-var">💾 Сохранить: <span class="var-tag">давление = {ответ}</span></div>
+      </div>
+
+      <!-- Block 2b -->
+      <div class="block-card">
+        <div class="block-head">
+          <div class="block-num">2б</div>
+          <span class="block-name">Квалификация — Гидростанции</span>
+        </div>
+        <div class="block-body">
+          <div class="block-msg-wrap">
+            <div class="tg-bubble">Подберём гидростанцию. ⚙️
+
+Для какого оборудования она нужна?</div>
+          </div>
+          <div class="block-btns">
+            <div class="tg-btn">Гидравлический пресс <span class="arrow">→ Блок 3б</span></div>
+            <div class="tg-btn">Подъёмное оборудование <span class="arrow">→ Блок 3б</span></div>
+            <div class="tg-btn">Испытательный стенд <span class="arrow">→ Блок 3б</span></div>
+            <div class="tg-btn">Другое применение <span class="arrow">→ Блок 3б</span></div>
+          </div>
+        </div>
+        <div class="block-var">💾 Сохранить: <span class="var-tag">категория = Гидростанции</span></div>
+      </div>
+
+      <!-- Block 2v -->
+      <div class="block-card">
+        <div class="block-head">
+          <div class="block-num">2в</div>
+          <span class="block-name">Квалификация — Испытательные стенды</span>
+        </div>
+        <div class="block-body">
+          <div class="block-msg-wrap">
+            <div class="tg-bubble">Расскажите, что планируете испытывать? 🧪</div>
+          </div>
+          <div class="block-btns">
+            <div class="tg-btn">Гидроцилиндры <span class="arrow">→ Блок 3в</span></div>
+            <div class="tg-btn">Насосы и гидромоторы <span class="arrow">→ Блок 3в</span></div>
+            <div class="tg-btn">Гидрораспределители <span class="arrow">→ Блок 3в</span></div>
+            <div class="tg-btn">Несколько видов <span class="arrow">→ Блок 3в</span></div>
+          </div>
+        </div>
+        <div class="block-var">💾 Сохранить: <span class="var-tag">категория = Испытательные стенды</span></div>
+      </div>
+
+      <!-- Block 5a (срок) -->
+      <div class="block-card">
+        <div class="block-head">
+          <div class="block-num">5а</div>
+          <span class="block-name">Срок — общий для всех категорий</span>
+        </div>
+        <div class="block-body">
+          <div class="block-msg-wrap">
+            <div class="tg-bubble">Когда нужно оборудование?</div>
+          </div>
+          <div class="block-btns">
+            <div class="tg-btn">🔴 Срочно — до 5 дней <span class="arrow">→ Блок 6</span></div>
+            <div class="tg-btn">🟡 1–2 недели <span class="arrow">→ Блок 6</span></div>
+            <div class="tg-btn">🟢 В течение месяца <span class="arrow">→ Блок 6</span></div>
+            <div class="tg-btn">🔵 Прорабатываем <span class="arrow">→ Блок 6</span></div>
+          </div>
+        </div>
+        <div class="block-var">💾 Сохранить: <span class="var-tag">срок = {ответ}</span> <span class="var-tag">приоритет = горячий/тёплый/холодный</span></div>
+      </div>
+
+      <!-- Block 6 -->
+      <div class="block-card">
+        <div class="block-head">
+          <div class="block-num">6</div>
+          <span class="block-name">Сбор контакта — Имя и компания</span>
+        </div>
+        <div class="block-body">
+          <div class="block-msg-wrap">
+            <div class="tg-bubble">Отлично, картина понятна.
+
+Чтобы передать запрос менеджеру и уточнить наличие на складе — как вас зовут и из какой компании?</div>
+            <div class="tg-meta">Ввод текста → Блок 7</div>
+          </div>
+        </div>
+        <div class="block-var">💾 Сохранить: <span class="var-tag">имя_компания = {ответ}</span></div>
+      </div>
+
+      <!-- Block 7 -->
+      <div class="block-card">
+        <div class="block-head">
+          <div class="block-num">7</div>
+          <span class="block-name">Сбор контакта — Телефон</span>
+        </div>
+        <div class="block-body">
+          <div class="block-msg-wrap">
+            <div class="tg-bubble">И номер телефона для связи?</div>
+          </div>
+          <div class="block-btns">
+            <div class="tg-btn">📱 Отправить мой номер <span class="arrow">→ Блок 8</span></div>
+            <div class="tg-btn">Введу вручную <span class="arrow">→ Блок 8</span></div>
+          </div>
+        </div>
+        <div class="block-var">💾 Сохранить: <span class="var-tag">телефон = {ответ}</span></div>
+      </div>
+
+      <!-- Block 8 -->
+      <div class="block-card">
+        <div class="block-head">
+          <div class="block-num green">8</div>
+          <span class="block-name">Подтверждение клиенту</span>
+        </div>
+        <div class="block-body">
+          <div class="block-msg-wrap">
+            <div class="tg-bubble">Спасибо! ✅
+
+Ваш запрос принят и передан менеджеру.
+
+📋 Что вы оставили:
+• Оборудование: {категория}
+• Срок: {срок}
+• Контакт: {имя_компания}
+
+Свяжемся в течение 10 минут в рабочее время (пн–пт, 9:00–18:00).</div>
+          </div>
+          <div class="block-btns">
+            <div class="tg-btn">📂 Каталог PDF <span class="arrow">→ файл</span></div>
+            <div class="tg-btn">📞 Позвоните сами <span class="arrow">→ tel:</span></div>
+            <div class="tg-btn">💬 Задать ещё вопрос <span class="arrow">→ Блок 2г</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block manager -->
+      <div class="block-card">
+        <div class="block-head">
+          <div class="block-num red">M</div>
+          <span class="block-name">Уведомление менеджеру (отдельный чат)</span>
+          <span class="block-trigger">Авто после Блока 8</span>
+        </div>
+        <div class="block-body">
+          <div class="block-msg-wrap">
+            <div class="tg-bubble manager">{приоритет=горячий → 🔴 СРОЧНО}
+{приоритет=тёплый  → 🟡 Новая заявка}
+{приоритет=холодный→ 🔵 Лид на проработку}
+
+━━━━━━━━━━━━━━━━━
+👤 {имя_компания}
+📱 {телефон}
+🏭 {категория}
+⚙️ {давление} / {ход} / {привод}
+⏱ Срок: {срок}
+━━━━━━━━━━━━━━━━━
+💬 История в CRM: [ссылка]</div>
+          </div>
+          <div class="block-btns">
+            <div class="tg-btn">✅ Принял, звоню</div>
+            <div class="tg-btn">📋 Открыть в CRM</div>
+            <div class="tg-btn">🔄 Перенести на завтра</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Follow-up -->
+  <div class="section">
+    <div class="section-title">Раздел 5</div>
+    <h2>Цепочка Follow-up</h2>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-dot d0">0</div>
+        <div class="tl-content">
+          <div class="tl-label">День 0 — Сразу после заявки</div>
+          <div class="tl-msg">✅ Заявка принята. Менеджер свяжется в течение 10 минут.</div>
+          <div style="margin-top:6px;font-size:12px;color:var(--gray);">⚠️ Если менеджер не ответил через 15 мин → автоуведомление ему повторно</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot d1">+1д</div>
+        <div class="tl-content">
+          <div class="tl-label">День 1 — Если сделка не закрыта</div>
+          <div class="tl-msg">{имя}, добрый день!
+
+Успели ознакомиться с нашим предложением по {категория}?
+Готов ответить на вопросы или выслать расчёт стоимости.</div>
+          <div class="tl-btns">
+            <span class="tl-btn">Да, интересно</span>
+            <span class="tl-btn">Пришлите расчёт</span>
+            <span class="tl-btn">Пока не актуально</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot d3">+3д</div>
+        <div class="tl-content">
+          <div class="tl-label">День 3 — Нет ответа на День 1</div>
+          <div class="tl-msg">{имя}, на случай если вопрос ещё в проработке 👇
+
+Сейчас на складе есть позиции по вашему запросу ({категория}).
+Выслать список с ценами?</div>
+          <div class="tl-btns">
+            <span class="tl-btn">Да, пришлите</span>
+            <span class="tl-btn">Свяжитесь со мной</span>
+            <span class="tl-btn">Не сейчас</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot d7">+7д</div>
+        <div class="tl-content">
+          <div class="tl-label">День 7 — Финальный follow-up</div>
+          <div class="tl-msg">{имя}, последний раз напомню о себе 🙂
+
+Если проект ещё в стадии выбора — готовы сделать бесплатный технический расчёт под ваши задачи. Это займёт 1 день.</div>
+          <div class="tl-btns">
+            <span class="tl-btn">🔴 Да, сделайте расчёт</span>
+            <span class="tl-btn">Нет, спасибо</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot d60">+60д</div>
+        <div class="tl-content">
+          <div class="tl-label">День 60 — Реактивация после отказа</div>
+          <div class="tl-msg">{имя}, добрый день!
+
+Прошло время — возможно, появились новые задачи по гидравлике.
+Мы обновили каталог. Посмотреть?</div>
+          <div class="tl-btns">
+            <span class="tl-btn">Да, актуально</span>
+            <span class="tl-btn">Нет</span>
+          </div>
+          <div style="margin-top:6px;font-size:12px;color:var(--gray);">«Нет» → архив. Больше не беспокоить.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CRM Integration -->
+  <div class="section">
+    <div class="section-title">Раздел 6</div>
+    <h2>Интеграция с CRM</h2>
+    <div class="crm-flow">
+      <div class="crm-node">
+        <div class="crm-node-ico">💬</div>
+        <div class="crm-node-name">Telegram</div>
+        <div class="crm-node-sub">@PromgidravlikaBot</div>
+      </div>
+      <div class="crm-arrow">→</div>
+      <div class="crm-node highlight">
+        <div class="crm-node-ico">⚡</div>
+        <div class="crm-node-name">BotHelp</div>
+        <div class="crm-node-sub">Flow + переменные</div>
+      </div>
+      <div class="crm-arrow">→</div>
+      <div class="crm-node">
+        <div class="crm-node-ico">🔗</div>
+        <div class="crm-node-name">Make.com</div>
+        <div class="crm-node-sub">Webhook → сценарий</div>
+      </div>
+      <div class="crm-arrow">→</div>
+      <div class="crm-node highlight">
+        <div class="crm-node-ico">📊</div>
+        <div class="crm-node-name">AmoCRM</div>
+        <div class="crm-node-sub">Контакт + Сделка</div>
+      </div>
+      <div class="crm-arrow">→</div>
+      <div class="crm-node">
+        <div class="crm-node-ico">✅</div>
+        <div class="crm-node-name">Задача</div>
+        <div class="crm-node-sub">Позвонить за 10 мин</div>
+      </div>
+      <div class="crm-arrow">→</div>
+      <div class="crm-node">
+        <div class="crm-node-ico">🔔</div>
+        <div class="crm-node-name">Telegram</div>
+        <div class="crm-node-sub">Уведомление менеджеру</div>
+      </div>
+    </div>
+    <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div style="background:var(--gray-l);border-radius:10px;padding:18px;">
+        <div style="font-weight:700;font-size:13px;margin-bottom:10px;">Что создаётся в AmoCRM автоматически</div>
+        <div style="font-size:12px;color:var(--text2);line-height:2;">
+          ✅ Контакт (имя, телефон, Telegram ID)<br>
+          ✅ Сделка (категория, параметры, срок)<br>
+          ✅ Тег (горячий / тёплый / холодный)<br>
+          ✅ Задача менеджеру «Позвонить»<br>
+          ✅ Примечание — полная история переписки
+        </div>
+      </div>
+      <div style="background:var(--gray-l);border-radius:10px;padding:18px;">
+        <div style="font-weight:700;font-size:13px;margin-bottom:10px;">Минимальный старт без CRM</div>
+        <div style="font-size:12px;color:var(--text2);line-height:2;">
+          📊 Google Sheets (через Make.com)<br>
+          🔔 Telegram-уведомление с кнопками<br>
+          &nbsp;&nbsp;&nbsp;[✅ Принял] [📞 Звоню] [❌ Не наш]<br>
+          ⏱ Настройка: 2–3 часа<br>
+          💰 Стоимость: 0 ₽/мес (лимит Make Free)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stack -->
+  <div class="section">
+    <div class="section-title">Раздел 7</div>
+    <h2>Технологический стек</h2>
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="stack-tool">🤖 BotHelp.ru</div>
+        <div class="stack-desc">Визуальный конструктор flow, авторассылки, переменные, AI-модуль для ответов из базы знаний</div>
+        <div class="stack-price">от 2 000 ₽/мес</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-tool">🔗 Make.com</div>
+        <div class="stack-desc">Интеграции: Telegram → CRM, Google Sheets, уведомления. Сценарии без кода.</div>
+        <div class="stack-price">0–9 $/мес</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-tool">📊 AmoCRM</div>
+        <div class="stack-desc">CRM для B2B продаж: воронка, задачи, аналитика, Telegram-интеграция</div>
+        <div class="stack-price">от 499 ₽/польз./мес</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-tool">📄 База знаний (AI)</div>
+        <div class="stack-desc">PDF-каталоги → BotHelp AI отвечает на технические вопросы по вашим документам</div>
+        <div class="stack-price">от 3 000 ₽/мес</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-tool">📱 Telegram BotFather</div>
+        <div class="stack-desc">Настройка команд (/start, /catalog, /order), описание, кнопка меню</div>
+        <div class="stack-price">Бесплатно</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-tool">📈 Google Sheets</div>
+        <div class="stack-desc">Минимальная замена CRM на старте: все лиды в таблице с автозаполнением</div>
+        <div class="stack-price">Бесплатно</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roadmap -->
+  <div class="section">
+    <div class="section-title">Раздел 8</div>
+    <h2>План внедрения — 4 недели</h2>
+    <div class="roadmap">
+      <div class="rm-card">
+        <div class="rm-week">Неделя 1</div>
+        <div class="rm-title">Flow квалификации</div>
+        <div class="rm-item">Зарегистрироваться в BotHelp</div>
+        <div class="rm-item">Подключить @PromgidravlikaBot</div>
+        <div class="rm-item">Создать блоки 1–8 по сценарию</div>
+        <div class="rm-item">Настроить уведомление менеджеру</div>
+        <div class="rm-item">Тест: пройти flow самому</div>
+      </div>
+      <div class="rm-card">
+        <div class="rm-week">Неделя 2</div>
+        <div class="rm-title">CRM интеграция</div>
+        <div class="rm-item">Зарегистрировать AmoCRM</div>
+        <div class="rm-item">Настроить воронку продаж</div>
+        <div class="rm-item">Make.com: BotHelp → AmoCRM</div>
+        <div class="rm-item">Автосоздание сделки + задачи</div>
+        <div class="rm-item">Проверить скоринг тегов</div>
+      </div>
+      <div class="rm-card">
+        <div class="rm-week">Неделя 3</div>
+        <div class="rm-title">Follow-up цепочка</div>
+        <div class="rm-item">Авторассылки в BotHelp</div>
+        <div class="rm-item">День +1, +3, +7 после заявки</div>
+        <div class="rm-item">Условие: сделка не закрыта</div>
+        <div class="rm-item">Реактивация на День 60</div>
+        <div class="rm-item">A/B тест текстов</div>
+      </div>
+      <div class="rm-card">
+        <div class="rm-week">Неделя 4</div>
+        <div class="rm-title">AI база знаний</div>
+        <div class="rm-item">Загрузить PDF-каталоги в BotHelp AI</div>
+        <div class="rm-item">Настроить ответы на тех. вопросы</div>
+        <div class="rm-item">Проверить точность ответов</div>
+        <div class="rm-item">Интеграция виджета на p-gidravlika.ru</div>
+        <div class="rm-item">Запуск и аналитика</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="background:#0D1B2A;color:#94A3B8;padding:28px 60px;display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+    <div>
+      <strong style="color:#F0F6FC;">ПРОМГИДРАВЛИКА</strong> · Сценарный Flow v1.0 · 2026
+    </div>
+    <div style="color:#64748B;">@PromgidravlikaBot · p-gidravlika.ru</div>
+  </div>
+
+</div>
+
+<script>
+  /* Авто-дата в футере */
+  const d = new Date();
+  const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+</script>
+
+</body>
+</html>
