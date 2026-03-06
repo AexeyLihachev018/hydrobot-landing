@@ -2052,12 +2052,14 @@ document.querySelectorAll('.faq-q').forEach(btn => {
     if (bad && withShake) shake(field);
   }
 
-  fName.addEventListener('input',  () => { if (fName.value)  mark(fName,  eName,  !checkName(fName.value),  true); });
-  fEmail.addEventListener('input', () => { if (fEmail.value) mark(fEmail, eEmail, !checkEmail(fEmail.value), true); });
-  fMsg.addEventListener('input',   () => { if (fMsg.value)   mark(fMsg,   eMsg,   !checkMsg(fMsg.value),    true); });
-  fName.addEventListener('blur',  () => { mark(fName,  eName,  !checkName(fName.value),  false); });
-  fEmail.addEventListener('blur', () => { mark(fEmail, eEmail, !checkEmail(fEmail.value), false); });
-  fMsg.addEventListener('blur',   () => { mark(fMsg,   eMsg,   !checkMsg(fMsg.value),    false); });
+  /* Во время ввода — только снимаем ошибку, если значение стало верным */
+  fName.addEventListener('input',  () => { if (checkName(fName.value))   mark(fName,  eName,  false, false); });
+  fEmail.addEventListener('input', () => { if (checkEmail(fEmail.value)) mark(fEmail, eEmail, false, false); });
+  fMsg.addEventListener('input',   () => { if (checkMsg(fMsg.value))     mark(fMsg,   eMsg,   false, false); });
+  /* При уходе из поля — показываем ошибку тихо (без тряски), только если что-то введено */
+  fName.addEventListener('blur',  () => { if (fName.value)  mark(fName,  eName,  !checkName(fName.value),  false); });
+  fEmail.addEventListener('blur', () => { if (fEmail.value) mark(fEmail, eEmail, !checkEmail(fEmail.value), false); });
+  fMsg.addEventListener('blur',   () => { if (fMsg.value)   mark(fMsg,   eMsg,   !checkMsg(fMsg.value),    false); });
 
   function resetForm() {
     formOk.classList.remove('show');
